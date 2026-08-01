@@ -1,0 +1,910 @@
+{
+  "users": [
+    {
+      "id": "seamstress_1",
+      "displayName": "Fatoumata Diallo",
+      "email": "fatoumata@harmysewing.com",
+      "role": "seamstress",
+      "photoURL": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "phone": "+221 77 123 45 67",
+      "whatsapp": "https://wa.me/221771234567",
+      "atelierId": "atelier_1",
+      "subscription": {
+        "status": "active",
+        "plan": "Atelier Premium",
+        "renewalDate": "2026-12-31"
+      },
+      "createdAt": "2026-01-10T10:00:00Z"
+    },
+    {
+      "id": "seamstress_2",
+      "displayName": "Awa Koné",
+      "email": "awa@prestigewax.com",
+      "role": "seamstress",
+      "photoURL": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "phone": "+225 07 456 78 90",
+      "whatsapp": "https://wa.me/225074567890",
+      "atelierId": "atelier_2",
+      "subscription": {
+        "status": "active",
+        "plan": "Atelier Premium",
+        "renewalDate": "2026-11-30"
+      },
+      "createdAt": "2026-02-15T09:30:00Z"
+    },
+    {
+      "id": "customer_1",
+      "displayName": "Amina Bello",
+      "email": "amina@gmail.com",
+      "role": "customer",
+      "photoURL": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+      "phone": "+234 803 123 4567",
+      "whatsapp": "https://wa.me/2348031234567",
+      "atelierId": null,
+      "subscription": {
+        "status": "inactive",
+        "plan": "free",
+        "renewalDate": ""
+      },
+      "createdAt": "2026-03-01T14:20:00Z"
+    },
+    {
+      "id": "customer_2",
+      "displayName": "Mariama Sylla",
+      "email": "mariama@outlook.com",
+      "role": "customer",
+      "photoURL": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150",
+      "phone": "+221 70 987 65 43",
+      "whatsapp": "https://wa.me/221709876543",
+      "atelierId": null,
+      "subscription": {
+        "status": "inactive",
+        "plan": "free",
+        "renewalDate": ""
+      },
+      "createdAt": "2026-03-05T16:45:00Z"
+    },
+    {
+      "id": "admin_1",
+      "displayName": "Harmonie Nankaf",
+      "email": "nankafuharmonie@gmail.com",
+      "role": "admin",
+      "photoURL": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150",
+      "phone": "+33 6 12 34 56 78",
+      "whatsapp": "",
+      "atelierId": null,
+      "subscription": {
+        "status": "inactive",
+        "plan": "free",
+        "renewalDate": ""
+      },
+      "createdAt": "2026-01-01T08:00:00Z"
+    }
+  ],
+  "ateliers": [
+    {
+      "id": "atelier_1",
+      "ownerId": "seamstress_1",
+      "name": "Maison de Couture Harmy'sewing",
+      "location": {
+        "city": "Dakar",
+        "country": "Sénégal"
+      },
+      "bio": "Spécialiste de la haute couture africaine traditionnelle et moderne. Confections d'exception en Wax hollandais, Bazin riche et dentelles de luxe pour toutes vos cérémonies de prestige.",
+      "pricing": "Robes simples à partir de 15,000 XOF. Ensembles grand boubou à partir de 35,000 XOF.",
+      "portfolioCoverURL": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800",
+      "createdAt": "2026-01-10T10:15:00Z",
+      "rating": 4.8,
+      "reviews": [
+        {
+          "authorName": "Amina Bello",
+          "rating": 5,
+          "text": "Un travail d'une précision incroyable. Les finitions du grand boubou sont impeccables !",
+          "createdAt": "2026-04-10T15:00:00Z"
+        },
+        {
+          "authorName": "Kadiatou Touré",
+          "rating": 4,
+          "text": "Très satisfaite de ma commande de mariage. Je recommande vivement Fatoumata !",
+          "createdAt": "2026-05-18T10:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "atelier_2",
+      "ownerId": "seamstress_2",
+      "name": "Atelier Prestige Wax",
+      "location": {
+        "city": "Abidjan",
+        "country": "Côte d'Ivoire"
+      },
+      "bio": "Créatrice engagée pour la valorisation du pagne africain. Combinaisons modernes, jupes crayons et costumes sur mesure stylisés pour la femme active.",
+      "pricing": "Jupes à partir de 8,000 XOF. Robes de soirée à partir de 25,000 XOF.",
+      "portfolioCoverURL": "https://images.unsplash.com/photo-1572495537021-a67b12938b8b?w=800",
+      "createdAt": "2026-02-15T10:00:00Z",
+      "rating": 4.5,
+      "reviews": [
+        {
+          "authorName": "Mariama Sylla",
+          "rating": 5,
+          "text": "La combinaison en Wax s'ajuste parfaitement. Excellent rapport qualité/prix !",
+          "createdAt": "2026-05-20T12:00:00Z"
+        }
+      ]
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust_local_1",
+      "atelierId": "atelier_1",
+      "type": "local",
+      "registeredUserId": null,
+      "name": "Ramata Ndiaye (Cliente Locale)",
+      "phone": "+221 77 555 12 34",
+      "notes": "Préfère les coupes cintrées. Habituellement réticente aux décolletés plongeants.",
+      "measurements": {
+        "bust": 92,
+        "waist": 74,
+        "hips": 102,
+        "arm": 32
+      },
+      "createdAt": "2026-02-01T11:00:00Z"
+    },
+    {
+      "id": "cust_reg_1",
+      "atelierId": "atelier_1",
+      "type": "registered",
+      "registeredUserId": "customer_1",
+      "name": "Amina Bello",
+      "phone": "+234 803 123 4567",
+      "notes": "Partage ses mesures en temps réel depuis son profil client.",
+      "measurements": {
+        "bust": 88,
+        "waist": 68,
+        "hips": 96,
+        "arm": 30
+      },
+      "createdAt": "2026-03-02T09:00:00Z"
+    },
+    {
+      "id": "cust_reg_2",
+      "atelierId": "atelier_2",
+      "type": "registered",
+      "registeredUserId": "customer_2",
+      "name": "Mariama Sylla",
+      "phone": "+221 70 987 65 43",
+      "notes": "Adore les motifs floraux de Wax hollandais.",
+      "measurements": {
+        "bust": 95,
+        "waist": 78,
+        "hips": 108,
+        "arm": 33
+      },
+      "createdAt": "2026-03-06T10:00:00Z"
+    }
+  ],
+  "measureBooks": [
+    {
+      "customerUserId": "customer_1",
+      "measurements": {
+        "bust": 88,
+        "waist": 68,
+        "hips": 96,
+        "arm": 30
+      },
+      "shares": [
+        "atelier_1"
+      ],
+      "updatedAt": "2026-03-02T09:00:00Z"
+    },
+    {
+      "customerUserId": "customer_2",
+      "measurements": {
+        "bust": 95,
+        "waist": 78,
+        "hips": 108,
+        "arm": 33
+      },
+      "shares": [
+        "atelier_2",
+        "atelier_1"
+      ],
+      "updatedAt": "2026-03-06T10:00:00Z"
+    }
+  ],
+  "posts": [
+    {
+      "id": "post_bogolan_yellow",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Veste Asymétrique Peplum Bogolan & Or Impérial — Veste peplum haute couture confectionnée dans un tissu Bogolan noble aux teintes ocre safran et noir profond, aux lignes géométriques rythmées et sublimée par un bouton-bijou or.",
+      "priceHint": 85000,
+      "currency": "XOF",
+      "tags": [
+        "Bogolan",
+        "Haute Couture",
+        "Motifs Géométriques",
+        "Peplum",
+        "Or"
+      ],
+      "media": [
+        "/bogolan_yellow_blazer.jpg"
+      ],
+      "likeCount": 89,
+      "commentCount": 3,
+      "likes": [
+        "customer_1",
+        "customer_2"
+      ],
+      "comments": [
+        {
+          "id": "cb1",
+          "authorName": "Amina Bello",
+          "authorAvatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+          "text": "Cette coupe asymétrique et ce motif ocre/noir sont absolument divins !",
+          "createdAt": "2026-07-28T14:00:00Z"
+        }
+      ],
+      "createdAt": "2026-07-28T10:00:00Z"
+    },
+    {
+      "id": "post_bogolan_emerald",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Corsage Émeraude & Cowries Royale à Manches Cloches — Pièce d'apparat épaules dénudées avec manches spectaculaires évasées, drapée dans un tissu émeraude, noir et blanc orné de symboles géométriques, cauris sacrés et croix diamants.",
+      "priceHint": 95000,
+      "currency": "XOF",
+      "tags": [
+        "Émeraude",
+        "Cowries",
+        "Manches Cloches",
+        "Haute Couture",
+        "Chic"
+      ],
+      "media": [
+        "/emerald_bogolan_top.jpg"
+      ],
+      "likeCount": 112,
+      "commentCount": 4,
+      "likes": [
+        "customer_1",
+        "customer_2"
+      ],
+      "comments": [
+        {
+          "id": "cb2",
+          "authorName": "Mariama Sylla",
+          "authorAvatar": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150",
+          "text": "La royauté des manches cloches et le vert émeraude ! Je commande tout de suite.",
+          "createdAt": "2026-07-29T11:00:00Z"
+        }
+      ],
+      "createdAt": "2026-07-29T08:00:00Z"
+    },
+    {
+      "id": "post_1",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Robe Sirène Impériale Léopard & Bronze — Majestueuse création de haute couture avec corset perlé en strass d'or, épaulettes sculpturales drapées et traîne volumineuse en cascades d'imprimé léopard. Un chef-d'œuvre de prestige pour les grandes cérémonies.",
+      "priceHint": 150000,
+      "currency": "XOF",
+      "tags": [
+        "Haute Couture",
+        "Sirène",
+        "Léopard",
+        "Prestige",
+        "Chic"
+      ],
+      "media": [
+        "/hero_couture_dress.jpg"
+      ],
+      "likeCount": 42,
+      "commentCount": 2,
+      "likes": [
+        "customer_1",
+        "customer_2"
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "authorName": "Amina Bello",
+          "authorAvatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+          "text": "Ces couleurs sont incroyables, j'adore la structure des épaules !",
+          "createdAt": "2026-07-15T10:00:00Z"
+        },
+        {
+          "id": "c2",
+          "authorName": "Mariama Sylla",
+          "authorAvatar": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150",
+          "text": "Quel chef d'œuvre ! Fatoumata, vous vous êtes surpassée.",
+          "createdAt": "2026-07-16T12:00:00Z"
+        }
+      ],
+      "createdAt": "2026-07-10T12:00:00Z"
+    },
+    {
+      "id": "post_2",
+      "authorId": "seamstress_2",
+      "authorName": "Awa Koné",
+      "authorAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "atelierId": "atelier_2",
+      "caption": "Robe Sirène Impériale en Kente — Splendide robe de cérémonie en tissu Kente tissé main de fils d'or et de soie rose/orangée, avec une traîne royale spectaculaire. Une pièce maîtresse pour les célébrations de prestige.",
+      "priceHint": 120000,
+      "currency": "XOF",
+      "tags": [
+        "Kente",
+        "Traditionnel",
+        "Mariage",
+        "Prestige"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=800"
+      ],
+      "likeCount": 68,
+      "commentCount": 1,
+      "likes": [
+        "customer_1"
+      ],
+      "comments": [
+        {
+          "id": "c3",
+          "authorName": "Amina Bello",
+          "authorAvatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+          "text": "Une robe digne d'une reine pour un mariage d'exception.",
+          "createdAt": "2026-07-12T16:00:00Z"
+        }
+      ],
+      "createdAt": "2026-07-11T15:30:00Z"
+    },
+    {
+      "id": "post_3",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Robe Émeraude Royale — Majestueuse robe de bal bouffante en imprimé wax vert émeraude et jaune safran. Corset drapé en satin de soie d'une élégance digne d'une reine, idéale pour les grandes occasions.",
+      "priceHint": 85000,
+      "currency": "XOF",
+      "tags": [
+        "Wax",
+        "Royal",
+        "Chic",
+        "Traditionnel"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800"
+      ],
+      "likeCount": 55,
+      "commentCount": 0,
+      "likes": [
+        "customer_2",
+        "seamstress_2"
+      ],
+      "comments": [],
+      "createdAt": "2026-07-12T09:00:00Z"
+    },
+    {
+      "id": "post_4",
+      "authorId": "seamstress_2",
+      "authorName": "Awa Koné",
+      "authorAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "atelierId": "atelier_2",
+      "caption": "Robe de Prestige Écorce de Cannelle — Robe sirène transparente couleur cannelle ornée de dentelle perlée ivoire dessinant des ramages délicats sur le corps. Une véritable pièce d'art vestimentaire.",
+      "priceHint": 95000,
+      "currency": "XOF",
+      "tags": [
+        "HauteCouture",
+        "Prestige",
+        "Moderne",
+        "Chic"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800"
+      ],
+      "likeCount": 39,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-13T10:00:00Z"
+    },
+    {
+      "id": "post_5",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Fourreau Chocolat & Kente Brodé — Ensemble d'exception marron chocolat perlé de jais sur l'encolure bateau, et bas sirène drapé en motif kente traditionnel et pailleté.",
+      "priceHint": 65000,
+      "currency": "XOF",
+      "tags": [
+        "Kente",
+        "Chic",
+        "Traditionnel",
+        "Prestige"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800"
+      ],
+      "likeCount": 47,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-14T11:00:00Z"
+    },
+    {
+      "id": "post_6",
+      "authorId": "seamstress_2",
+      "authorName": "Awa Koné",
+      "authorAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "atelierId": "atelier_2",
+      "caption": "Robe Sirène Soleil de Bronze — Robe de soirée drapée en satin de soie marron bronze avec un corset sculpté rayonnant de fines broderies dorées en forme de soleil.",
+      "priceHint": 75000,
+      "currency": "XOF",
+      "tags": [
+        "HauteCouture",
+        "Moderne",
+        "Prestige"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1572495537021-a67b12938b8b?w=800"
+      ],
+      "likeCount": 51,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-15T14:00:00Z"
+    },
+    {
+      "id": "post_7",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Robe Cuivrée d'Apparat — Somptueuse robe de mariée sirène en dentelle de bronze rehaussée d'une double traîne amovible en satin de soie cuivré drapé à la main.",
+      "priceHint": 130000,
+      "currency": "XOF",
+      "tags": [
+        "Mariage",
+        "Prestige",
+        "HauteCouture"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1607990283143-e81e7a2c93ab?w=800"
+      ],
+      "likeCount": 72,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-16T09:00:00Z"
+    },
+    {
+      "id": "post_8",
+      "authorId": "seamstress_2",
+      "authorName": "Awa Koné",
+      "authorAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "atelierId": "atelier_2",
+      "caption": "Création Majesté Violette — Robe de cérémonie sirène en dentelle et velours dégradé de pourpre et violet, vendue avec son éventail assorti entièrement brodé main.",
+      "priceHint": 80000,
+      "currency": "XOF",
+      "tags": [
+        "Chic",
+        "Mariage",
+        "Prestige",
+        "Traditionnel"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800"
+      ],
+      "likeCount": 63,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-17T15:00:00Z"
+    },
+    {
+      "id": "post_9",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Ensemble d'Apparat Couple Impérial — Tenues coordonnées pour couple : robe sirène drapée vert émeraude pour elle, et grand boubou agbada traditionnel assorti avec broderies géométriques or pour lui.",
+      "priceHint": 150000,
+      "currency": "XOF",
+      "tags": [
+        "Mariage",
+        "Traditionnel",
+        "Royal",
+        "Kente"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?w=800"
+      ],
+      "likeCount": 89,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-18T10:00:00Z"
+    },
+    {
+      "id": "post_10",
+      "authorId": "seamstress_2",
+      "authorName": "Awa Koné",
+      "authorAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "atelierId": "atelier_2",
+      "caption": "Robe de Mariée Reine d'Afrique — Robe de mariée sirène blanche éblouissante en dentelle de Calais entièrement perlée, avec une traîne cathédrale volantée d'une splendeur inoubliable.",
+      "priceHint": 250000,
+      "currency": "XOF",
+      "tags": [
+        "Mariage",
+        "HauteCouture",
+        "Prestige"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1590075865003-e48277fda558?w=800"
+      ],
+      "likeCount": 95,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-18T16:00:00Z"
+    },
+    {
+      "id": "post_11",
+      "authorId": "seamstress_1",
+      "authorName": "Fatoumata Diallo",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "atelierId": "atelier_1",
+      "caption": "Robe Mandarine de Prestige — Chef-d'œuvre de haute couture orange mandarine entièrement brodé de perles et de sequins d'or, orné d'une fleur sculptée à l'épaule droite.",
+      "priceHint": 110000,
+      "currency": "XOF",
+      "tags": [
+        "HauteCouture",
+        "Prestige",
+        "Chic"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800"
+      ],
+      "likeCount": 58,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-19T09:00:00Z"
+    },
+    {
+      "id": "post_12",
+      "authorId": "seamstress_2",
+      "authorName": "Awa Koné",
+      "authorAvatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+      "atelierId": "atelier_2",
+      "caption": "Robe Volumineuse Léopard Couture — Robe de bal spectaculaire à volants étagés volumineux imprimés léopard sauvage et broderies de perles brunes. Pour les femmes audacieuses.",
+      "priceHint": 140000,
+      "currency": "XOF",
+      "tags": [
+        "HauteCouture",
+        "Moderne",
+        "Chic"
+      ],
+      "media": [
+        "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800"
+      ],
+      "likeCount": 77,
+      "commentCount": 0,
+      "likes": [],
+      "comments": [],
+      "createdAt": "2026-07-19T14:30:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "order_1",
+      "atelierId": "atelier_1",
+      "customerRefId": "cust_reg_1",
+      "customerName": "Amina Bello",
+      "customerPhone": "+234 803 123 4567",
+      "customerType": "registered",
+      "modelPostId": "post_1",
+      "modelCaption": "Robe sirène Wax/Tulle ambré",
+      "status": "SEWING",
+      "fabricReceived": true,
+      "dueDate": "2026-08-15",
+      "pricing": {
+        "total": 45000,
+        "deposit": 25000,
+        "balance": 20000,
+        "currency": "XOF"
+      },
+      "timestamps": {
+        "createdAt": "2026-07-01T10:00:00Z",
+        "updatedAt": "2026-07-15T11:00:00Z",
+        "deliveredAt": null
+      },
+      "events": [
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Commande créée. Tissu validé.",
+          "createdAt": "2026-07-01T10:00:00Z"
+        },
+        {
+          "type": "PAYMENT_ADDED",
+          "byUserId": "seamstress_1",
+          "text": "Acompte de 25 000 XOF enregistré.",
+          "createdAt": "2026-07-01T10:15:00Z"
+        },
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Passage en cours de couture.",
+          "createdAt": "2026-07-15T11:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "order_2",
+      "atelierId": "atelier_1",
+      "customerRefId": "cust_local_1",
+      "customerName": "Ramata Ndiaye (Cliente Locale)",
+      "customerPhone": "+221 77 555 12 34",
+      "customerType": "local",
+      "modelPostId": null,
+      "modelCaption": "Ensemble Wax Jupe & Haut classique",
+      "status": "FABRIC_RECEIVED",
+      "fabricReceived": true,
+      "dueDate": "2026-08-20",
+      "pricing": {
+        "total": 20000,
+        "deposit": 10000,
+        "balance": 10000,
+        "currency": "XOF"
+      },
+      "timestamps": {
+        "createdAt": "2026-07-10T14:00:00Z",
+        "updatedAt": "2026-07-10T14:00:00Z",
+        "deliveredAt": null
+      },
+      "events": [
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Commande créée. Tissu déposé.",
+          "createdAt": "2026-07-10T14:00:00Z"
+        },
+        {
+          "type": "PAYMENT_ADDED",
+          "byUserId": "seamstress_1",
+          "text": "Acompte de 10 000 XOF enregistré.",
+          "createdAt": "2026-07-10T14:10:00Z"
+        }
+      ]
+    },
+    {
+      "id": "order_3",
+      "atelierId": "atelier_1",
+      "customerRefId": "cust_reg_1",
+      "customerName": "Amina Bello",
+      "customerPhone": "+234 803 123 4567",
+      "customerType": "registered",
+      "modelPostId": "post_3",
+      "modelCaption": "Grand Boubou Bazin brodé or",
+      "status": "FITTING_READY",
+      "fabricReceived": true,
+      "dueDate": "2026-07-30",
+      "pricing": {
+        "total": 75000,
+        "deposit": 50000,
+        "balance": 25000,
+        "currency": "XOF"
+      },
+      "timestamps": {
+        "createdAt": "2026-06-20T10:00:00Z",
+        "updatedAt": "2026-07-18T16:00:00Z",
+        "deliveredAt": null
+      },
+      "events": [
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Commande créée. Bazin haut de gamme livré.",
+          "createdAt": "2026-06-20T10:00:00Z"
+        },
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Couture terminée. Prêt pour l'essayage final.",
+          "createdAt": "2026-07-18T16:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "order_4",
+      "atelierId": "atelier_1",
+      "customerRefId": "cust_reg_1",
+      "customerName": "Amina Bello",
+      "customerPhone": "+234 803 123 4567",
+      "customerType": "registered",
+      "modelPostId": null,
+      "modelCaption": "Robe de demoiselle d'honneur Wax",
+      "status": "DELIVERED",
+      "fabricReceived": true,
+      "dueDate": "2026-07-15",
+      "pricing": {
+        "total": 18000,
+        "deposit": 18000,
+        "balance": 0,
+        "currency": "XOF"
+      },
+      "timestamps": {
+        "createdAt": "2026-06-15T09:00:00Z",
+        "updatedAt": "2026-07-14T17:00:00Z",
+        "deliveredAt": "2026-07-14T17:00:00Z"
+      },
+      "events": [
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Livre de couture complété.",
+          "createdAt": "2026-06-15T09:00:00Z"
+        },
+        {
+          "type": "STATUS_CHANGED",
+          "byUserId": "seamstress_1",
+          "text": "Vêtement livré avec succès. Solde entièrement payé.",
+          "createdAt": "2026-07-14T17:00:00Z"
+        }
+      ]
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conv_1",
+      "members": [
+        "customer_1",
+        "seamstress_1"
+      ],
+      "memberDetails": {
+        "customer_1": {
+          "name": "Amina Bello",
+          "photoURL": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+          "role": "customer"
+        },
+        "seamstress_1": {
+          "name": "Fatoumata Diallo",
+          "photoURL": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+          "role": "seamstress"
+        }
+      },
+      "atelierId": "atelier_1",
+      "lastMessageAt": "2026-07-27T10:46:52.148Z",
+      "lastMessagePreview": "Bonjour ! Merci beaucoup pour les détails, vos créations sont magnifiques. Pouvons-nous programmer un rendez-vous d'essayage bientôt ?"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "conversationId": "conv_1",
+      "from": "customer_1",
+      "type": "text",
+      "text": "Bonjour Madame Fatoumata, je souhaitais avoir des nouvelles de ma commande de robe sirène ?",
+      "createdAt": "2026-07-19T14:00:00Z"
+    },
+    {
+      "id": "m2",
+      "conversationId": "conv_1",
+      "from": "seamstress_1",
+      "type": "text",
+      "text": "Bonjour Amina, votre Robe sirène avance très bien ! Le buste est presque terminé.",
+      "createdAt": "2026-07-19T14:30:00Z"
+    },
+    {
+      "id": "msg_qo9n89vkj",
+      "conversationId": "conv_1",
+      "from": "seamstress_1",
+      "type": "text",
+      "text": "hey",
+      "createdAt": "2026-07-27T10:46:48.100Z"
+    },
+    {
+      "id": "msg_sup079b9i",
+      "conversationId": "conv_1",
+      "from": "seamstress_1",
+      "type": "text",
+      "text": "hey",
+      "createdAt": "2026-07-27T10:46:49.174Z"
+    },
+    {
+      "id": "msg_a3sobvu86",
+      "conversationId": "conv_1",
+      "from": "customer_1",
+      "type": "text",
+      "text": "Bonjour ! Merci beaucoup pour les détails, vos créations sont magnifiques. Pouvons-nous programmer un rendez-vous d'essayage bientôt ?",
+      "createdAt": "2026-07-27T10:46:49.603Z"
+    },
+    {
+      "id": "msg_vb6ajbuhv",
+      "conversationId": "conv_1",
+      "from": "seamstress_1",
+      "type": "text",
+      "text": "hey",
+      "createdAt": "2026-07-27T10:46:49.756Z"
+    },
+    {
+      "id": "msg_q5r2bw3pf",
+      "conversationId": "conv_1",
+      "from": "seamstress_1",
+      "type": "text",
+      "text": "hey",
+      "createdAt": "2026-07-27T10:46:50.158Z"
+    },
+    {
+      "id": "msg_pvxcim0bf",
+      "conversationId": "conv_1",
+      "from": "seamstress_1",
+      "type": "text",
+      "text": "hey",
+      "createdAt": "2026-07-27T10:46:50.646Z"
+    },
+    {
+      "id": "msg_1mk7xyry1",
+      "conversationId": "conv_1",
+      "from": "customer_1",
+      "type": "text",
+      "text": "Bonjour ! Merci beaucoup pour les détails, vos créations sont magnifiques. Pouvons-nous programmer un rendez-vous d'essayage bientôt ?",
+      "createdAt": "2026-07-27T10:46:50.675Z"
+    },
+    {
+      "id": "msg_tefzsve9k",
+      "conversationId": "conv_1",
+      "from": "customer_1",
+      "type": "text",
+      "text": "Bonjour ! Merci beaucoup pour les détails, vos créations sont magnifiques. Pouvons-nous programmer un rendez-vous d'essayage bientôt ?",
+      "createdAt": "2026-07-27T10:46:51.257Z"
+    },
+    {
+      "id": "msg_t1qadts8i",
+      "conversationId": "conv_1",
+      "from": "customer_1",
+      "type": "text",
+      "text": "Bonjour ! Merci beaucoup pour les détails, vos créations sont magnifiques. Pouvons-nous programmer un rendez-vous d'essayage bientôt ?",
+      "createdAt": "2026-07-27T10:46:51.659Z"
+    },
+    {
+      "id": "msg_qddv0f51y",
+      "conversationId": "conv_1",
+      "from": "customer_1",
+      "type": "text",
+      "text": "Bonjour ! Merci beaucoup pour les détails, vos créations sont magnifiques. Pouvons-nous programmer un rendez-vous d'essayage bientôt ?",
+      "createdAt": "2026-07-27T10:46:52.148Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_1",
+      "atelierId": "atelier_1",
+      "title": "Couper le bazin pour le boubou royal",
+      "completed": true,
+      "dueDate": "2026-07-18"
+    },
+    {
+      "id": "task_2",
+      "atelierId": "atelier_1",
+      "title": "Ajuster les manches de la robe sirène d'Amina",
+      "completed": false,
+      "dueDate": "2026-07-22"
+    },
+    {
+      "id": "task_3",
+      "atelierId": "atelier_1",
+      "title": "Rendez-vous essayage final Amina (Boubou)",
+      "completed": false,
+      "dueDate": "2026-07-24"
+    }
+  ],
+  "reports": []
+}

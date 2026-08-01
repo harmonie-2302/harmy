@@ -1,0 +1,6 @@
+{
+  "name": "Harmy'sewing",
+  "description": "Plateforme moderne de gestion d'ateliers de couture et vitrine de créations de mode africaine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

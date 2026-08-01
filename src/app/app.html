@@ -1,0 +1,191 @@
+<div class="min-h-screen flex flex-col bg-pagne-subtle">
+  
+  <!-- Main Header Navigation -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gold-500/20 custom-shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+      
+      <!-- Logo Branding -->
+      <a routerLink="/" class="flex items-center gap-2.5 group">
+        <span class="p-2.5 rounded-2xl bg-gradient-to-tr from-noir-profond via-bordeaux-950 to-emerald-950 text-gold-500 flex items-center justify-center custom-shadow border border-gold-500/30">
+          <span class="material-icons text-xl sm:text-2xl group-hover:rotate-12 transition-transform">content_cut</span>
+        </span>
+        <div>
+          <span class="serif-header text-lg sm:text-2xl font-bold text-gray-900 tracking-wide block">Harmy'sewing</span>
+          <span class="text-[9px] uppercase tracking-widest text-gold-600 font-extrabold block" style="font-size: 8px;">Haute Couture & Atelier</span>
+        </div>
+      </a>
+
+      <!-- Desktop Horizontal Menu Links -->
+      <nav class="hidden md:flex items-center gap-1.5">
+        <a 
+          routerLink="/" 
+          routerLinkActive="bg-gold-50 text-gold-700 font-bold border-gold-500/30" 
+          [routerLinkActiveOptions]="{exact: true}"
+          class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-gold-600 hover:bg-gold-50/50 transition-all flex items-center gap-1.5 border border-transparent">
+          <span class="material-icons text-base text-gold-500">style</span> Explorer
+        </a>
+
+        <!-- Seamstress Workspace Tab -->
+        @if (api.currentUser()?.role === 'seamstress') {
+          <a 
+            routerLink="/atelier" 
+            routerLinkActive="bg-emerald-50 text-emerald-800 font-bold border-emerald-600/30"
+            class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-emerald-800 hover:bg-emerald-50/50 transition-all flex items-center gap-1.5 border border-transparent">
+            <span class="material-icons text-base text-emerald-800">cut</span> Mon Atelier (SaaS)
+          </a>
+        } @else {
+          <a 
+            routerLink="/atelier" 
+            routerLinkActive="bg-emerald-50 text-emerald-800 font-bold border-emerald-600/30"
+            class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:text-emerald-800 hover:bg-emerald-50/50 transition-all flex items-center gap-1.5 border border-transparent"
+            title="Espace atelier privé de gestion">
+            <span class="material-icons text-base text-emerald-800">cut</span> Atelier SaaS
+          </a>
+        }
+
+        <!-- Client Space Tab -->
+        @if (api.currentUser()?.role === 'customer') {
+          <a 
+            routerLink="/client" 
+            routerLinkActive="bg-bordeaux-50 text-bordeaux-800 font-bold border-bordeaux-600/30"
+            class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-bordeaux-800 hover:bg-bordeaux-50/50 transition-all flex items-center gap-1.5 border border-transparent">
+            <span class="material-icons text-base text-bordeaux-800">accessibility</span> Mon Espace Cliente
+          </a>
+        } @else {
+          <a 
+            routerLink="/client" 
+            routerLinkActive="bg-bordeaux-50 text-bordeaux-800 font-bold border-bordeaux-600/30"
+            class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-500 hover:text-bordeaux-800 hover:bg-bordeaux-50/50 transition-all flex items-center gap-1.5 border border-transparent"
+            title="Carnet de mesures et suivi">
+            <span class="material-icons text-base text-bordeaux-800">accessibility</span> Espace Cliente
+          </a>
+        }
+
+        <a 
+          routerLink="/chat" 
+          routerLinkActive="bg-gold-50 text-gold-700 font-bold border-gold-500/30"
+          class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-gold-600 hover:bg-gold-50/50 transition-all flex items-center gap-1.5 border border-transparent">
+          <span class="material-icons text-base text-gold-500">chat_bubble</span> Messagerie
+        </a>
+
+        @if (api.currentUser()?.role === 'admin') {
+          <a 
+            routerLink="/admin" 
+            routerLinkActive="bg-noir-profond text-gold-400 font-bold border-gold-500/30"
+            class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-gold-600 hover:bg-gold-50/50 transition-all flex items-center gap-1.5 border border-transparent">
+            <span class="material-icons text-base text-gold-500">admin_panel_settings</span> Admin
+          </a>
+        }
+      </nav>
+
+      <!-- Right actions: User Switcher / Profile Badge -->
+      <div class="flex items-center gap-2.5 sm:gap-4">
+        
+        <!-- Live Seeding Account Toggler -->
+        <div class="flex items-center gap-1.5 bg-gold-50/80 p-1.5 rounded-xl border border-gold-500/20">
+          <span class="material-icons text-gold-600 text-xs sm:text-sm pl-1.5 hidden sm:inline">sync</span>
+          <span class="text-[9px] uppercase tracking-wider text-gold-800 font-bold hidden lg:inline">Simuler :</span>
+          <select 
+            [value]="api.currentUser()?.id || ''"
+            (change)="onSwitchDemoUser($event)"
+            class="bg-white border-0 text-gray-800 text-[10px] sm:text-xs font-bold rounded-lg px-2.5 py-1 focus:ring-1 focus:ring-gold-500 outline-none cursor-pointer">
+            <option value="" disabled>-- Choisir Rôle --</option>
+            @for (u of api.allUsers(); track u.id) {
+              <option [value]="u.id">
+                {{ u.displayName }} ({{ u.role === 'seamstress' ? 'Couturière' : u.role === 'admin' ? 'Admin' : 'Cliente' }})
+              </option>
+            }
+          </select>
+        </div>
+
+        <!-- Profile Photo / Gate -->
+        @if (api.currentUser(); as user) {
+          <div class="flex items-center gap-2">
+            <img 
+              [src]="user.photoURL" 
+              class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gold-500 custom-shadow" 
+              [alt]="user.displayName"
+              referrerpolicy="no-referrer">
+            <div class="hidden xl:block text-left">
+              <span class="text-[10px] font-bold text-gray-900 leading-none block">{{ user.displayName }}</span>
+              <span class="text-[8px] font-bold uppercase tracking-wider text-gold-600 mt-0.5 block">
+                {{ user.role === 'seamstress' ? 'Couturière' : user.role === 'admin' ? 'Admin' : 'Cliente' }}
+              </span>
+            </div>
+          </div>
+        } @else {
+          <a 
+            routerLink="/auth" 
+            class="btn-gold px-4 py-2 text-xs font-bold flex items-center gap-1">
+            <span class="material-icons text-sm">login</span> Connexion
+          </a>
+        }
+
+      </div>
+    </div>
+    <!-- Geometric African Pagne Divider right under sticky header -->
+    <div class="pagne-divider opacity-70"></div>
+  </header>
+
+  <!-- Mobile Bottom Navigation (Tactile-First responsive behavior) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-mahogany-100 flex items-center justify-around h-16 px-2 pb-1 custom-shadow-lg">
+    <a 
+      routerLink="/" 
+      routerLinkActive="text-mahogany-500 font-bold" 
+      [routerLinkActiveOptions]="{exact: true}"
+      class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
+      <span class="material-icons text-xl">style</span>
+      <span class="text-[8px] font-semibold tracking-wider mt-0.5">Explorer</span>
+    </a>
+
+    <a 
+      routerLink="/atelier" 
+      routerLinkActive="text-mahogany-500 font-bold"
+      class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
+      <span class="material-icons text-xl">cut</span>
+      <span class="text-[8px] font-semibold tracking-wider mt-0.5">Atelier</span>
+    </a>
+
+    <a 
+      routerLink="/client" 
+      routerLinkActive="text-mahogany-500 font-bold"
+      class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
+      <span class="material-icons text-xl">accessibility</span>
+      <span class="text-[8px] font-semibold tracking-wider mt-0.5">Fiche</span>
+    </a>
+
+    <a 
+      routerLink="/chat" 
+      routerLinkActive="text-mahogany-500 font-bold"
+      class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
+      <span class="material-icons text-xl">chat_bubble</span>
+      <span class="text-[8px] font-semibold tracking-wider mt-0.5">Messages</span>
+    </a>
+
+    @if (api.currentUser()?.role === 'admin') {
+      <a 
+        routerLink="/admin" 
+        routerLinkActive="text-mahogany-500 font-bold"
+        class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
+        <span class="material-icons text-xl">admin_panel_settings</span>
+        <span class="text-[8px] font-semibold tracking-wider mt-0.5">Admin</span>
+      </a>
+    }
+  </nav>
+
+  <!-- Router Outlet Wrapper -->
+  <main class="flex-grow pb-24 md:pb-8">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer Simple (3 mots seulement) -->
+  <footer class="bg-gradient-to-r from-mahogany-950 via-mahogany-900 to-amber-950 text-amber-100 py-8 text-center border-t border-amber-900/20 relative z-10">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="serif-header text-sm sm:text-base font-semibold tracking-wider text-amber-200">
+        Harmy'sewing &bull; Mode &bull; Élégance
+      </p>
+    </div>
+  </footer>
+
+</div>
+
