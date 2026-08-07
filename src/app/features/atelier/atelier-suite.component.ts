@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@ang
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HarmyApiService as HarmyApi, Order, CustomerAtelier, FinanceSummary, Task } from '@core/services/harmy-api.service';
+import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,28 +13,20 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle">
       
-      <!-- Guard Banner (If Not Seamstress) -->
-      @if (api.currentUser()?.role !== 'seamstress') {
+      <!-- Guard Banner (If Not Authenticated) -->
+      @if (!authService.isAuthenticated()) {
         <div class="text-center py-16 max-w-xl mx-auto bg-white border border-gold-500/20 rounded-3xl pagne-card p-8">
-          <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 animate-bounce border border-gold-500/30">
+          <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 border border-gold-500/30">
             <span class="material-icons text-4xl">lock</span>
           </span>
-          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace Atelier Privé (SaaS)</h2>
+          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace Atelier Privé</h2>
           <p class="text-xs text-gray-600 leading-relaxed font-light mb-6">
-            Cette section est exclusivement réservée aux ateliers de couture professionnels abonnés. Elle regroupe le suivi des mesures numériques, le tableau de bord Kanban et le bilan comptable.
+            Cette section est exclusivement réservée aux maisons de couture connectées.
           </p>
-          <div class="p-4 bg-gold-50/80 rounded-2xl border border-gold-500/30 mb-6 text-left">
-            <h4 class="text-xs font-bold text-gold-800 flex items-center gap-1.5 mb-1">
-              <span class="material-icons text-sm text-gold-600">visibility</span> Mode Démo d'Harmy'sewing
-            </h4>
-            <p class="text-[11px] text-gray-700 font-light leading-normal">
-              Pour explorer cet espace de gestion, connectez-vous instantanément en tant que <strong>Fatoumata Diallo (Couturière)</strong> à l'aide du bouton ci-dessous.
-            </p>
-          </div>
           <button 
-            (click)="switchToDemostress()"
+            (click)="router.navigate(['/auth/login'])"
             class="btn-gold px-6 py-3 text-xs font-bold shadow-md">
-            Se connecter comme Fatoumata Diallo
+            Se connecter à votre espace
           </button>
         </div>
       } @else {
@@ -70,7 +63,7 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
-        <!-- Section: Finance Overview Widgets (FR-FIN) -->
+        <!-- Section: Finance Overview Widgets -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           
           <div class="bg-gradient-to-br from-gold-50 to-white p-5 rounded-2xl border border-gold-500/30 custom-shadow">
@@ -79,7 +72,7 @@ import { CommonModule } from '@angular/common';
               <span class="material-icons text-gold-600 text-lg">account_balance_wallet</span>
             </div>
             <h3 class="text-xl font-bold text-gray-900 serif-header">
-              {{ finance()?.totalRevenue | number }} {{ finance()?.currency }}
+              {{ finance()?.totalRevenue || 0 | number }} {{ finance()?.currency || 'FCFA' }}
             </h3>
             <p class="text-[10px] text-gray-500 mt-1 font-light">Commandes livrées + acomptes</p>
           </div>
@@ -90,7 +83,7 @@ import { CommonModule } from '@angular/common';
               <span class="material-icons text-emerald-700 text-lg">monetization_on</span>
             </div>
             <h3 class="text-xl font-bold text-emerald-900 serif-header">
-              {{ finance()?.totalDeposits | number }} {{ finance()?.currency }}
+              {{ finance()?.totalDeposits || 0 | number }} {{ finance()?.currency || 'FCFA' }}
             </h3>
             <p class="text-[10px] text-emerald-800 mt-1 font-light">Garanties financières de production</p>
           </div>
@@ -101,7 +94,7 @@ import { CommonModule } from '@angular/common';
               <span class="material-icons text-red-500 text-lg">schedule</span>
             </div>
             <h3 class="text-xl font-bold text-gray-700 serif-header">
-              {{ finance()?.totalBalancesDue | number }} {{ finance()?.currency }}
+              {{ finance()?.totalBalancesDue || 0 | number }} {{ finance()?.currency || 'FCFA' }}
             </h3>
             <p class="text-[10px] text-gray-400 mt-1 font-light">À percevoir à la remise finale</p>
           </div>
@@ -112,13 +105,13 @@ import { CommonModule } from '@angular/common';
               <span class="material-icons text-gray-400 text-lg">style</span>
             </div>
             <h3 class="text-xl font-bold text-gray-800 serif-header">
-              {{ finance()?.activeOrderCount }} / {{ finance()?.orderCount }}
+              {{ finance()?.activeOrderCount || 0 }} / {{ finance()?.orderCount || 0 }}
             </h3>
             <p class="text-[10px] text-gray-400 mt-1 font-light">Commandes actives en atelier</p>
           </div>
         </div>
 
-        <!-- TAB CONTENT: KANBAN BOARD (FR-PIPE) -->
+        <!-- TAB CONTENT: KANBAN BOARD -->
         @if (activeTab() === 'kanban') {
           <div class="mb-6 flex justify-between items-center flex-wrap gap-2">
             <h2 class="serif-header text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -190,7 +183,7 @@ import { CommonModule } from '@angular/common';
             <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex flex-col min-h-[450px]">
               <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
                 <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Livré (Clôturé)
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Livré
                 </span>
                 <span class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
                   {{ ordersByStatus('DELIVERED').length }}
@@ -223,7 +216,7 @@ import { CommonModule } from '@angular/common';
           </div>
         }
 
-        <!-- TAB CONTENT: CUSTOMERS & MEASUREMENTS (FR-MEASURE) -->
+        <!-- TAB CONTENT: CUSTOMERS & MEASUREMENTS -->
         @if (activeTab() === 'clients') {
           <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow mb-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
@@ -232,7 +225,7 @@ import { CommonModule } from '@angular/common';
                   Carnet Digital de Mesures Clients
                 </h2>
                 <p class="text-xs text-gray-500 font-light mt-0.5">
-                  Gestion centralisée des mensurations d'atelier (Centimètres)
+                  Gestion centralisée des mensurations d'atelier
                 </p>
               </div>
               <button 
@@ -244,7 +237,7 @@ import { CommonModule } from '@angular/common';
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               @for (c of customers(); track c.id) {
-                <div class="p4 bg-pagne-subtle/50 rounded-2xl border border-gray-100 hover:border-gold-500/30 transition-all">
+                <div class="p-4 bg-pagne-subtle/50 rounded-2xl border border-gray-100 hover:border-gold-500/30 transition-all">
                   <div class="flex justify-between items-start mb-2">
                     <div>
                       <h4 class="font-bold text-gray-900 text-sm flex items-center gap-1.5">
@@ -272,19 +265,19 @@ import { CommonModule } from '@angular/common';
                   <div class="grid grid-cols-4 gap-1.5 text-center my-3 bg-white p-2.5 rounded-xl border border-gold-500/10 text-[11px]">
                     <div>
                       <span class="block text-[9px] text-gray-400 font-bold uppercase">Poitrine</span>
-                      <strong class="text-gray-800">{{ c.measurements.bust }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                      <strong class="text-gray-800">{{ c.measurements?.bust }}</strong> <span class="text-[9px] text-gray-400">cm</span>
                     </div>
                     <div>
                       <span class="block text-[9px] text-gray-400 font-bold uppercase">Taille</span>
-                      <strong class="text-gray-800">{{ c.measurements.waist }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                      <strong class="text-gray-800">{{ c.measurements?.waist }}</strong> <span class="text-[9px] text-gray-400">cm</span>
                     </div>
                     <div>
                       <span class="block text-[9px] text-gray-400 font-bold uppercase">Bassin</span>
-                      <strong class="text-gray-800">{{ c.measurements.hips }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                      <strong class="text-gray-800">{{ c.measurements?.hips }}</strong> <span class="text-[9px] text-gray-400">cm</span>
                     </div>
                     <div>
                       <span class="block text-[9px] text-gray-400 font-bold uppercase">Bras</span>
-                      <strong class="text-gray-800">{{ c.measurements.arm }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                      <strong class="text-gray-800">{{ c.measurements?.arm }}</strong> <span class="text-[9px] text-gray-400">cm</span>
                     </div>
                   </div>
 
@@ -293,6 +286,11 @@ import { CommonModule } from '@angular/common';
                       "{{ c.notes }}"
                     </p>
                   }
+                </div>
+              }
+              @if (customers().length === 0) {
+                <div class="col-span-full py-8 text-center text-xs text-gray-400 italic">
+                  Aucun client enregistré dans la base de données.
                 </div>
               }
             </div>
@@ -331,6 +329,9 @@ import { CommonModule } from '@angular/common';
                   </button>
                 </div>
               }
+              @if (tasks().length === 0) {
+                <p class="text-xs text-gray-400 italic text-center py-4">Aucune tâche en attente.</p>
+              }
             </div>
           </div>
         }
@@ -346,7 +347,7 @@ import { CommonModule } from '@angular/common';
             <span class="text-[10px] font-bold text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-500/20">
               #{{ o.id.substring(0,6) }}
             </span>
-            <h4 class="font-bold text-gray-900 text-xs mt-1">{{ o.customerName }}</h4>
+            <h4 class="font-bold text-gray-900 text-xs mt-1">{{ o.customerName || 'Client' }}</h4>
           </div>
           
           <button (click)="deleteOrder(o.id)" class="text-gray-400 hover:text-red-500 text-xs">
@@ -362,15 +363,15 @@ import { CommonModule } from '@angular/common';
         <div class="bg-gray-50 p-2 rounded-xl border border-gray-100 text-[10px] space-y-1 mb-3">
           <div class="flex justify-between text-gray-500">
             <span>Total :</span>
-            <strong class="text-gray-800">{{ o.pricing.total }} {{ o.pricing.currency }}</strong>
+            <strong class="text-gray-800">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FCFA' }}</strong>
           </div>
           <div class="flex justify-between text-emerald-700 font-bold">
             <span>Acompte :</span>
-            <span>{{ o.pricing.deposit }} {{ o.pricing.currency }}</span>
+            <span>{{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FCFA' }}</span>
           </div>
-          <div class="flex justify-between font-bold" [class]="o.pricing.balance > 0 ? 'text-red-500' : 'text-emerald-600'">
+          <div class="flex justify-between font-bold" [class]="o.pricing?.balance > 0 ? 'text-red-500' : 'text-emerald-600'">
             <span>Solde restant :</span>
-            <span>{{ o.pricing.balance }} {{ o.pricing.currency }}</span>
+            <span>{{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FCFA' }}</span>
           </div>
         </div>
 
@@ -383,7 +384,7 @@ import { CommonModule } from '@angular/common';
             <option value="FABRIC_RECEIVED">Tissu Reçu</option>
             <option value="SEWING">En Couture</option>
             <option value="FITTING_READY">Prêt Essayage</option>
-            <option value="DELIVERED">Livré (Clôturer)</option>
+            <option value="DELIVERED">Livré</option>
             <option value="ARCHIVED">Archivé</option>
           </select>
         </div>
@@ -393,6 +394,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AtelierSuiteComponent implements OnInit {
   api = inject(HarmyApi);
+  authService = inject(AuthService);
   fb = inject(FormBuilder);
   router = inject(Router);
 
@@ -431,7 +433,9 @@ export class AtelierSuiteComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.loadData();
+    if (this.authService.isAuthenticated()) {
+      this.loadData();
+    }
   }
 
   async loadData() {
@@ -442,17 +446,13 @@ export class AtelierSuiteComponent implements OnInit {
         this.api.getTasks(),
         this.api.getFinanceSummary()
       ]);
-      this.orders.set(ordList);
-      this.customers.set(custMap);
-      this.tasks.set(tskList);
-      this.finance.set(finSum);
+      this.orders.set(ordList || []);
+      this.customers.set(custMap || []);
+      this.tasks.set(tskList || []);
+      this.finance.set(finSum || null);
     } catch (e) {
-      console.error(e);
+      console.error('Erreur chargement données atelier:', e);
     }
-  }
-
-  switchToDemostress() {
-    this.api.login('fatoumata@couture.sen');
   }
 
   ordersByStatus(status: string): Order[] {
@@ -495,10 +495,10 @@ export class AtelierSuiteComponent implements OnInit {
       name: c.name,
       phone: c.phone,
       notes: c.notes,
-      bust: c.measurements.bust,
-      waist: c.measurements.waist,
-      hips: c.measurements.hips,
-      arm: c.measurements.arm
+      bust: c.measurements?.bust || 0,
+      waist: c.measurements?.waist || 0,
+      hips: c.measurements?.hips || 0,
+      arm: c.measurements?.arm || 0
     });
     this.openClientModal.set(true);
   }
@@ -535,15 +535,7 @@ export class AtelierSuiteComponent implements OnInit {
       }
       this.openClientModal.set(false);
       this.isEditingClient.set(null);
-      this.clientForm.reset({
-        name: '',
-        phone: '',
-        notes: '',
-        bust: 90,
-        waist: 70,
-        hips: 100,
-        arm: 30
-      });
+      this.clientForm.reset();
     } catch (e) {
       console.error(e);
     }

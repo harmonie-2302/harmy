@@ -143,188 +143,147 @@ export interface FinanceSummary {
 })
 export class HarmyApiService {
   private http = inject(HttpClient);
+  private readonly baseUrl = 'http://localhost:8080/api/v1';
 
-  // Core global signals for reactive state
+  // Signals réactifs pour l'état d'application (alimentés exclusivement par le backend)
   currentUser = signal<User | null>(null);
   allUsers = signal<User[]>([]);
 
-  constructor() {
-    this.refreshSession();
-    this.fetchUsersList();
-  }
-
-  async refreshSession() {
-    try {
-      const user = await firstValueFrom(this.http.get<User>('/api/auth/current'));
-      this.currentUser.set(user);
-    } catch {
-      this.currentUser.set(null);
-    }
-  }
-
-  async fetchUsersList() {
-    try {
-      const list = await firstValueFrom(this.http.get<User[]>('/api/users/list'));
-      this.allUsers.set(list);
-    } catch {
-      this.allUsers.set([]);
-    }
-  }
-
-  async register(displayName: string, email: string, role: 'seamstress' | 'customer' | 'admin', phone: string): Promise<User> {
-    const user = await firstValueFrom(this.http.post<User>('/api/auth/register', { displayName, email, role, phone }));
-    this.currentUser.set(user);
-    await this.fetchUsersList();
-    return user;
-  }
-
-  async login(email: string): Promise<User> {
-    const user = await firstValueFrom(this.http.post<User>('/api/auth/login', { email }));
-    this.currentUser.set(user);
-    return user;
-  }
-
-  async switchUser(userId: string): Promise<User> {
-    const user = await firstValueFrom(this.http.post<User>('/api/auth/switch-user', { userId }));
-    this.currentUser.set(user);
-    return user;
-  }
-
   // --- Posts ---
   async getPosts(tag?: string): Promise<Post[]> {
-    const url = tag ? `/api/posts?tag=${encodeURIComponent(tag)}` : '/api/posts';
+    const url = tag ? `${this.baseUrl}/posts?tag=${encodeURIComponent(tag)}` : `${this.baseUrl}/posts`;
     return firstValueFrom(this.http.get<Post[]>(url));
   }
 
   async createPost(caption: string, priceHint: number, tags: string[], media: string[]): Promise<Post> {
-    return firstValueFrom(this.http.post<Post>('/api/posts', { caption, priceHint, tags, media }));
+    return firstValueFrom(this.http.post<Post>(`${this.baseUrl}/posts`, { caption, priceHint, tags, media }));
   }
 
   async toggleLike(postId: string): Promise<Post> {
-    return firstValueFrom(this.http.post<Post>(`/api/posts/${postId}/like`, {}));
+    return firstValueFrom(this.http.post<Post>(`${this.baseUrl}/posts/${postId}/like`, {}));
   }
 
   async addComment(postId: string, text: string): Promise<Post> {
-    return firstValueFrom(this.http.post<Post>(`/api/posts/${postId}/comment`, { text }));
+    return firstValueFrom(this.http.post<Post>(`${this.baseUrl}/posts/${postId}/comment`, { text }));
   }
 
   // --- Ateliers ---
   async getAteliers(): Promise<Atelier[]> {
-    return firstValueFrom(this.http.get<Atelier[]>('/api/ateliers'));
+    return firstValueFrom(this.http.get<Atelier[]>(`${this.baseUrl}/ateliers`));
   }
 
   async getAtelier(id: string): Promise<Atelier> {
-    return firstValueFrom(this.http.get<Atelier>(`/api/ateliers/${id}`));
+    return firstValueFrom(this.http.get<Atelier>(`${this.baseUrl}/ateliers/${id}`));
   }
 
   async updateAtelier(id: string, data: Partial<Atelier>): Promise<Atelier> {
-    return firstValueFrom(this.http.put<Atelier>(`/api/ateliers/${id}`, data));
+    return firstValueFrom(this.http.put<Atelier>(`${this.baseUrl}/ateliers/${id}`, data));
   }
 
   async addAtelierReview(id: string, rating: number, text: string): Promise<Atelier> {
-    return firstValueFrom(this.http.post<Atelier>(`/api/ateliers/${id}/reviews`, { rating, text }));
+    return firstValueFrom(this.http.post<Atelier>(`${this.baseUrl}/ateliers/${id}/reviews`, { rating, text }));
   }
 
   // --- Customers ---
   async getCustomers(): Promise<CustomerAtelier[]> {
-    return firstValueFrom(this.http.get<CustomerAtelier[]>('/api/customers'));
+    return firstValueFrom(this.http.get<CustomerAtelier[]>(`${this.baseUrl}/customers`));
   }
 
   async createCustomer(name: string, phone: string, notes: string, measurements: { bust: number; waist: number; hips: number; arm: number }, type?: 'local' | 'registered', registeredUserId?: string): Promise<CustomerAtelier> {
-    return firstValueFrom(this.http.post<CustomerAtelier>('/api/customers', { name, phone, notes, measurements, type, registeredUserId }));
+    return firstValueFrom(this.http.post<CustomerAtelier>(`${this.baseUrl}/customers`, { name, phone, notes, measurements, type, registeredUserId }));
   }
 
   async updateCustomer(id: string, data: Partial<CustomerAtelier>): Promise<CustomerAtelier> {
-    return firstValueFrom(this.http.put<CustomerAtelier>(`/api/customers/${id}`, data));
+    return firstValueFrom(this.http.put<CustomerAtelier>(`${this.baseUrl}/customers/${id}`, data));
   }
 
   // --- Measurements Sharing ---
   async getMyMeasureBook(): Promise<MeasureBook> {
-    return firstValueFrom(this.http.get<MeasureBook>('/api/measurements/my'));
+    return firstValueFrom(this.http.get<MeasureBook>(`${this.baseUrl}/measurements/my`));
   }
 
   async updateMyMeasureBook(measurements: { bust: number; waist: number; hips: number; arm: number }): Promise<MeasureBook> {
-    return firstValueFrom(this.http.put<MeasureBook>('/api/measurements/my', { measurements }));
+    return firstValueFrom(this.http.put<MeasureBook>(`${this.baseUrl}/measurements/my`, { measurements }));
   }
 
   async toggleShare(atelierId: string, grant: boolean): Promise<MeasureBook> {
-    return firstValueFrom(this.http.post<MeasureBook>('/api/measurements/my/shares', { atelierId, grant }));
+    return firstValueFrom(this.http.post<MeasureBook>(`${this.baseUrl}/measurements/my/shares`, { atelierId, grant }));
   }
 
   // --- Orders ---
   async getOrders(): Promise<Order[]> {
-    return firstValueFrom(this.http.get<Order[]>('/api/orders'));
+    return firstValueFrom(this.http.get<Order[]>(`${this.baseUrl}/orders`));
   }
 
   async createOrder(data: { customerRefId: string; modelPostId?: string | null; modelCaption?: string; total: number; deposit: number; dueDate?: string; fabricReceived?: boolean }): Promise<Order> {
-    return firstValueFrom(this.http.post<Order>('/api/orders', data));
+    return firstValueFrom(this.http.post<Order>(`${this.baseUrl}/orders`, data));
   }
 
   async updateOrderStatus(id: string, status: string): Promise<Order> {
-    return firstValueFrom(this.http.put<Order>(`/api/orders/${id}/status`, { status }));
+    return firstValueFrom(this.http.put<Order>(`${this.baseUrl}/orders/${id}/status`, { status }));
   }
 
   async addOrderPayment(id: string, amount: number): Promise<Order> {
-    return firstValueFrom(this.http.put<Order>(`/api/orders/${id}/payment`, { amount }));
+    return firstValueFrom(this.http.put<Order>(`${this.baseUrl}/orders/${id}/payment`, { amount }));
   }
 
   async deleteOrder(id: string): Promise<unknown> {
-    return firstValueFrom(this.http.delete<unknown>(`/api/orders/${id}`));
+    return firstValueFrom(this.http.delete<unknown>(`${this.baseUrl}/orders/${id}`));
   }
 
   // --- Chat ---
   async getConversations(): Promise<Conversation[]> {
-    return firstValueFrom(this.http.get<Conversation[]>('/api/conversations'));
+    return firstValueFrom(this.http.get<Conversation[]>(`${this.baseUrl}/conversations`));
   }
 
   async startConversation(otherUserId: string, atelierId?: string): Promise<Conversation> {
-    return firstValueFrom(this.http.post<Conversation>('/api/conversations', { otherUserId, atelierId }));
+    return firstValueFrom(this.http.post<Conversation>(`${this.baseUrl}/conversations`, { otherUserId, atelierId }));
   }
 
   async getMessages(conversationId: string): Promise<Message[]> {
-    return firstValueFrom(this.http.get<Message[]>(`/api/conversations/${conversationId}/messages`));
+    return firstValueFrom(this.http.get<Message[]>(`${this.baseUrl}/conversations/${conversationId}/messages`));
   }
 
   async sendMessage(conversationId: string, text: string): Promise<Message> {
-    return firstValueFrom(this.http.post<Message>(`/api/conversations/${conversationId}/messages`, { text }));
+    return firstValueFrom(this.http.post<Message>(`${this.baseUrl}/conversations/${conversationId}/messages`, { text }));
   }
 
   // --- Finance ---
   async getFinanceSummary(): Promise<FinanceSummary> {
-    return firstValueFrom(this.http.get<FinanceSummary>('/api/finance/summary'));
+    return firstValueFrom(this.http.get<FinanceSummary>(`${this.baseUrl}/finance/summary`));
   }
 
   // --- Tasks ---
   async getTasks(): Promise<Task[]> {
-    return firstValueFrom(this.http.get<Task[]>('/api/tasks'));
+    return firstValueFrom(this.http.get<Task[]>(`${this.baseUrl}/tasks`));
   }
 
   async createTask(title: string, dueDate?: string): Promise<Task> {
-    return firstValueFrom(this.http.post<Task>('/api/tasks', { title, dueDate }));
+    return firstValueFrom(this.http.post<Task>(`${this.baseUrl}/tasks`, { title, dueDate }));
   }
 
   async toggleTask(id: string): Promise<Task> {
-    return firstValueFrom(this.http.put<Task>(`/api/tasks/${id}`, {}));
+    return firstValueFrom(this.http.put<Task>(`${this.baseUrl}/tasks/${id}`, {}));
   }
 
   async deleteTask(id: string): Promise<unknown> {
-    return firstValueFrom(this.http.delete<unknown>(`/api/tasks/${id}`));
+    return firstValueFrom(this.http.delete<unknown>(`${this.baseUrl}/tasks/${id}`));
   }
 
   // --- Admin ---
   async getReports(): Promise<Report[]> {
-    return firstValueFrom(this.http.get<Report[]>('/api/admin/reports'));
+    return firstValueFrom(this.http.get<Report[]>(`${this.baseUrl}/admin/reports`));
   }
 
   async reportPost(postId: string, reason: string): Promise<Report> {
-    return firstValueFrom(this.http.post<Report>('/api/admin/reports', { postId, reason }));
+    return firstValueFrom(this.http.post<Report>(`${this.baseUrl}/admin/reports`, { postId, reason }));
   }
 
   async adminDeletePost(postId: string): Promise<unknown> {
-    return firstValueFrom(this.http.delete<unknown>(`/api/admin/posts/${postId}`));
+    return firstValueFrom(this.http.delete<unknown>(`${this.baseUrl}/admin/posts/${postId}`));
   }
 
   async adminToggleAtelierSubscription(atelierId: string): Promise<unknown> {
-    return firstValueFrom(this.http.put<unknown>(`/api/admin/ateliers/${atelierId}/subscription`, {}));
+    return firstValueFrom(this.http.put<unknown>(`${this.baseUrl}/admin/ateliers/${atelierId}/subscription`, {}));
   }
 }

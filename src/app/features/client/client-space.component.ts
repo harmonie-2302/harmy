@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@ang
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HarmyApiService as HarmyApi, Order, MeasureBook, Atelier } from '@core/services/harmy-api.service';
+import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,28 +13,20 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle">
       
-      <!-- Guard Banner (If Not Customer) -->
-      @if (api.currentUser()?.role !== 'customer') {
+      <!-- Guard Banner (If Not Authenticated) -->
+      @if (!authService.isAuthenticated()) {
         <div class="text-center py-16 max-w-xl mx-auto bg-white border border-gold-500/20 rounded-3xl pagne-card p-8">
-          <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 animate-bounce border border-gold-500/30">
+          <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 border border-gold-500/30">
             <span class="material-icons text-4xl">face</span>
           </span>
           <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace Personnel Cliente</h2>
           <p class="text-xs text-gray-600 leading-relaxed font-light mb-6">
-            Cet espace est destiné aux clientes d'exception. Il vous permet de configurer votre carnet de mesures, de partager l'accès de façon sécurisée avec l'atelier de votre choix, et de suivre en temps réel la confection de vos vêtements.
+            Cet espace vous permet de configurer votre carnet de mesures et de suivre en temps réel la confection de vos vêtements.
           </p>
-          <div class="p-4 bg-gold-50/80 rounded-2xl border border-gold-500/30 mb-6 text-left">
-            <h4 class="text-xs font-bold text-gold-800 flex items-center gap-1.5 mb-1">
-              <span class="material-icons text-sm text-gold-600">visibility</span> Mode Démo d'Harmy'sewing
-            </h4>
-            <p class="text-[11px] text-gray-700 font-light leading-normal">
-              Pour tester l'expérience d'une cliente connectée, changez de profil instantanément pour devenir <strong>Amina Bello (Cliente)</strong> ci-dessous.
-            </p>
-          </div>
           <button 
-            (click)="switchToDemocustomer()"
+            (click)="router.navigate(['/auth/login'])"
             class="btn-gold px-6 py-3 text-xs font-bold shadow-md">
-            Se connecter comme Amina Bello
+            Se connecter à votre espace
           </button>
         </div>
       } @else {
@@ -64,7 +57,7 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
-        <!-- TAB CONTENT: MY MEASUREMENTS & SHARING (FR-MEASURE) -->
+        <!-- TAB CONTENT: MY MEASUREMENTS & SHARING -->
         @if (activeTab() === 'measurements') {
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             
@@ -135,7 +128,7 @@ import { CommonModule } from '@angular/common';
                   <div class="p-3.5 rounded-2xl border border-gray-100 bg-pagne-subtle/30 flex items-center justify-between">
                     <div>
                       <h4 class="font-bold text-xs text-gray-900">{{ a.name }}</h4>
-                      <p class="text-[10px] text-gray-500 font-light">{{ a.location.city }}, {{ a.location.country }}</p>
+                      <p class="text-[10px] text-gray-500 font-light">{{ a.location?.city }}, {{ a.location?.country }}</p>
                     </div>
 
                     @if (isSharingWith(a.id)) {
@@ -152,6 +145,9 @@ import { CommonModule } from '@angular/common';
                       </button>
                     }
                   </div>
+                }
+                @if (ateliers().length === 0) {
+                  <p class="text-xs text-gray-400 italic text-center py-4">Aucun atelier partenaire enregistré.</p>
                 }
               </div>
             </div>
@@ -173,7 +169,7 @@ import { CommonModule } from '@angular/common';
                       <span class="text-[10px] font-bold text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-500/20">
                         Commande #{{ o.id.substring(0,6) }}
                       </span>
-                      <h3 class="font-bold text-gray-900 text-sm mt-1">{{ o.modelCaption }}</h3>
+                      <h3 class="font-bold text-gray-900 text-sm mt-1">{{ o.modelCaption || 'Confection sur mesure' }}</h3>
                     </div>
                     <span [class]="'text-xs font-bold px-3 py-1 rounded-full border ' + statusBadgeStyle(o.status)">
                       {{ statusLabel(o.status) }}
@@ -198,12 +194,17 @@ import { CommonModule } from '@angular/common';
 
                   <!-- Payment Summary -->
                   <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs">
-                    <span class="text-gray-500 font-light">Total: <strong class="text-gray-900 font-bold">{{ o.pricing.total }} {{ o.pricing.currency }}</strong></span>
-                    <span class="text-emerald-700 font-bold">Acompte: {{ o.pricing.deposit }} {{ o.pricing.currency }}</span>
-                    <span [class]="o.pricing.balance > 0 ? 'text-red-500 font-bold' : 'text-emerald-600 font-bold'">
-                      Solde Restant: {{ o.pricing.balance }} {{ o.pricing.currency }}
+                    <span class="text-gray-500 font-light">Total: <strong class="text-gray-900 font-bold">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FCFA' }}</strong></span>
+                    <span class="text-emerald-700 font-bold">Acompte: {{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FCFA' }}</span>
+                    <span [class]="(o.pricing?.balance || 0) > 0 ? 'text-red-500 font-bold' : 'text-emerald-600 font-bold'">
+                      Solde Restant: {{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FCFA' }}
                     </span>
                   </div>
+                </div>
+              }
+              @if (myOrders().length === 0) {
+                <div class="py-8 text-center text-xs text-gray-400 italic">
+                  Aucune commande enregistrée pour votre compte.
                 </div>
               }
             </div>
@@ -216,6 +217,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ClientSpaceComponent implements OnInit {
   api = inject(HarmyApi);
+  authService = inject(AuthService);
   fb = inject(FormBuilder);
   router = inject(Router);
 
@@ -233,7 +235,9 @@ export class ClientSpaceComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.loadAllData();
+    if (this.authService.isAuthenticated()) {
+      this.loadAllData();
+    }
   }
 
   async loadAllData() {
@@ -243,9 +247,9 @@ export class ClientSpaceComponent implements OnInit {
         this.api.getMyMeasureBook(),
         this.api.getAteliers()
       ]);
-      this.myOrders.set(orders);
-      this.measureBook.set(book);
-      this.ateliers.set(atList);
+      this.myOrders.set(orders || []);
+      this.measureBook.set(book || null);
+      this.ateliers.set(atList || []);
 
       if (book && book.measurements) {
         this.measureForm.patchValue({
@@ -256,26 +260,13 @@ export class ClientSpaceComponent implements OnInit {
         });
       }
     } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async switchToDemocustomer() {
-    try {
-      const all = this.api.allUsers();
-      const demoUser = all.find(u => u.role === 'customer');
-      if (demoUser) {
-        await this.api.switchUser(demoUser.id);
-        this.loadAllData();
-      }
-    } catch (e) {
-      console.error(e);
+      console.error('Erreur chargement données cliente:', e);
     }
   }
 
   isSharingWith(atelierId: string): boolean {
     const book = this.measureBook();
-    if (!book) return false;
+    if (!book || !book.shares) return false;
     return book.shares.includes(atelierId);
   }
 
@@ -302,7 +293,7 @@ export class ClientSpaceComponent implements OnInit {
     try {
       const updated = await this.api.updateMyMeasureBook(measurements);
       this.measureBook.set(updated);
-      alert("Vos dimensions corporelles ont été enregistrées avec succès et synchronisées !");
+      alert("Vos dimensions corporelles ont été enregistrées avec succès dans la base de données !");
     } catch (e) {
       console.error(e);
     }
@@ -323,7 +314,7 @@ export class ClientSpaceComponent implements OnInit {
     switch (status) {
       case 'FABRIC_RECEIVED': return 'bg-blue-100 text-blue-700';
       case 'SEWING': return 'bg-orange-100 text-orange-700';
-      case 'FITTING_READY': return 'bg-purple-100 text-purple-700 animate-pulse';
+      case 'FITTING_READY': return 'bg-purple-100 text-purple-700';
       case 'DELIVERED': return 'bg-emerald-100 text-emerald-700';
       default: return 'bg-gray-100 text-gray-500';
     }

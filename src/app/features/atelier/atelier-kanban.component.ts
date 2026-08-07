@@ -1,16 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  CdkDropListGroup,
-  CdkDropList,
-  CdkDrag,
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem
-} from '@angular/cdk/drag-drop';
-import { OrderService, OrderDto } from '../../core/services/order.service';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { OrderService, OrderDto } from '@core/services/order.service';
 
-interface KanbanColumn {
+export interface KanbanColumn {
   id: 'TISSU_RECU' | 'EN_COUTURE' | 'PRET_POUR_ESSAYAGE' | 'LIVRE';
   title: string;
   badgeColor: string;
@@ -20,98 +13,101 @@ interface KanbanColumn {
 @Component({
   selector: 'app-atelier-kanban',
   standalone: true,
-  imports: [
-    CommonModule,
-    CdkDropListGroup,
-    CdkDropList,
-    CdkDrag
-  ],
+  imports: [CommonModule, DragDropModule],
   template: `
-    <div class="p-6 bg-gray-950 text-white min-h-screen">
+    <div class="p-6 bg-gray-900 min-h-screen text-gray-100">
+      
+      <!-- Top Title Bar -->
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800">
+        <div>
+          <h1 class="text-3xl font-extrabold text-amber-500 tracking-wide flex items-center gap-3">
+            <span>✂️</span> Kanban Atelier Couture
+          </h1>
+          <p class="text-sm text-gray-400 mt-1">Gestion réactive des confections via Angular Signals & Spring Boot</p>
+        </div>
 
-      <!-- Toast Alert Error -->
-      <div *ngIf="errorMessage()" class="mb-6 p-4 bg-red-900/80 border border-red-500 rounded-xl text-red-200 flex justify-between items-center shadow-lg animate-bounce">
-        <span>⚠️ {{ errorMessage() }}</span>
-        <button (click)="clearError()" class="text-red-300 hover:text-white font-bold text-xl">&times;</button>
+        <button 
+          (click)="refresh()"
+          class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold rounded-xl shadow-lg transition flex items-center gap-2">
+          <span class="material-icons text-sm">refresh</span> Actualiser
+        </button>
       </div>
 
-      <!-- Header Tableau de Bord -->
-      <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-6">
-        <div>
-          <h1 class="text-3xl font-extrabold text-amber-500 tracking-tight flex items-center gap-3">
-            <span>✂️</span> Tableau Kanban de l'Atelier
-          </h1>
-          <p class="text-gray-400 mt-1">Suivi réactif des commandes et du flux de couture</p>
+      @if (errorMessage()) {
+        <div class="mb-6 p-4 bg-red-900/50 border border-red-500 text-red-200 rounded-xl text-sm font-medium">
+          ⚠️ {{ errorMessage() }}
         </div>
+      }
 
-        <div class="flex items-center gap-3">
-          <span class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-xs font-semibold text-gray-300">
-            Total Commandes: <strong class="text-amber-400 text-sm ml-1">{{ orderService.orders().length }}</strong>
-          </span>
-          <button (click)="refresh()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold text-sm rounded-xl transition shadow-lg flex items-center gap-2">
-            <span>🔄</span> Rafraîchir
-          </button>
+      <!-- Loading State -->
+      @if (orderService.loading()) {
+        <div class="flex items-center justify-center py-12 text-amber-400 gap-3 font-semibold">
+          <span class="material-icons animate-spin">sync</span> Chargement des commandes en cours...
         </div>
-      </header>
+      }
 
-      <!-- Zone Drag-and-Drop CDK -->
-      <div cdkDropListGroup class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-        <div *ngFor="let col of columns" class="bg-gray-900/90 rounded-2xl p-4 border border-gray-800 flex flex-col shadow-2xl">
-          
-          <!-- En-tête Colonne -->
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">{{ col.icon }}</span>
-              <h2 class="font-bold text-gray-200 text-base">{{ col.title }}</h2>
+      <!-- Kanban Columns Board -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        @for (col of columns; track col.id) {
+          <div class="bg-gray-800/80 backdrop-blur border border-gray-700 rounded-2xl p-4 flex flex-col min-h-[500px]">
+            
+            <!-- Column Header -->
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-700">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">{{ col.icon }}</span>
+                <h2 class="text-base font-bold text-white">{{ col.title }}</h2>
+              </div>
+              <span [class]="'px-2.5 py-0.5 text-xs font-extrabold rounded-full ' + col.badgeColor">
+                {{ getOrdersForColumn(col.id).length }}
+              </span>
             </div>
-            <span [class]="'px-2.5 py-1 rounded-full text-xs font-extrabold ' + col.badgeColor">
-              {{ getOrdersForColumn(col.id).length }}
-            </span>
-          </div>
 
-          <!-- Liste Droppable CDK -->
-          <div
-            cdkDropList
-            [cdkDropListData]="getOrdersForColumn(col.id)"
-            (cdkDropListDropped)="onDrop($event, col.id)"
-            class="flex-1 min-h-[500px] space-y-4 rounded-xl p-1 transition-colors bg-gray-900/40">
-
+            <!-- Drag & Drop Container -->
             <div
-              *ngFor="let order of getOrdersForColumn(col.id)"
-              cdkDrag
-              class="bg-gray-800/90 hover:bg-gray-800 rounded-xl p-4 border border-gray-700/70 hover:border-amber-500/60 shadow-xl cursor-grab active:cursor-grabbing transition duration-200 group">
+              cdkDropList
+              [id]="col.id"
+              [cdkDropListData]="getOrdersForColumn(col.id)"
+              [cdkDropListConnectedTo]="connectedDropLists"
+              (cdkDropListDropped)="onDrop($event, col.id)"
+              class="flex-1 space-y-3 min-h-[400px]">
 
-              <!-- Reference & Badge Solde -->
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-xs font-mono font-bold px-2 py-0.5 bg-gray-900 border border-gray-700 text-amber-400 rounded">
-                  {{ order.reference }}
-                </span>
-                <span [class]="order.soldeRestant === 0 ? 'text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800' : 'text-xs font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800'">
-                  {{ order.soldeRestant === 0 ? ' Payé' : ' Reste: ' + order.soldeRestant + ' FCFA' }}
-                </span>
-              </div>
+              @for (order of getOrdersForColumn(col.id); track order.id) {
+                <div 
+                  cdkDrag
+                  class="bg-gray-700 hover:bg-gray-650 border border-gray-600 rounded-xl p-4 shadow-md cursor-grab active:cursor-grabbing transition transform hover:-translate-y-0.5">
+                  
+                  <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
+                      {{ order.reference }}
+                    </span>
+                    <span class="text-xs text-gray-400 font-medium">
+                      Livraison: {{ order.dateLivraisonPrevue || 'N/A' }}
+                    </span>
+                  </div>
 
-              <!-- Description / Client -->
-              <h3 class="text-sm font-semibold text-gray-100 mb-1 group-hover:text-amber-400 transition">
-                {{ order.description || 'Commande de couture' }}
-              </h3>
+                  <p class="text-sm font-semibold text-gray-200 mb-3 line-clamp-2">
+                    {{ order.description || 'Confection sur mesure' }}
+                  </p>
 
-              <div class="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center text-xs text-gray-400">
-                <span>Prix: <strong class="text-gray-200">{{ order.prixTotal }} FCFA</strong></span>
-                <span class="text-[10px] bg-gray-900 px-2 py-1 rounded text-gray-400">
-                  📅 {{ order.dateLivraisonPrevue || 'N/A' }}
-                </span>
-              </div>
+                  <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-650">
+                    <span class="text-gray-400">Total: <strong class="text-white">{{ order.prixTotal | number }} FCFA</strong></span>
+                    <span [class]="order.soldeRestant > 0 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'">
+                      {{ order.soldeRestant > 0 ? 'Reste: ' + (order.soldeRestant | number) + ' FCFA' : 'Payé' }}
+                    </span>
+                  </div>
+                </div>
+              }
+
+              @if (getOrdersForColumn(col.id).length === 0) {
+                <div class="h-32 border-2 border-dashed border-gray-700 rounded-xl flex items-center justify-center text-gray-500 text-xs italic">
+                  Aucune commande
+                </div>
+              }
+
             </div>
-
-            <!-- Empty State Column -->
-            <div *ngIf="getOrdersForColumn(col.id).length === 0" class="h-32 flex items-center justify-center border-2 border-dashed border-gray-800 rounded-xl text-gray-600 text-xs italic">
-              Déposez une commande ici
-            </div>
-
           </div>
-        </div>
+        }
 
       </div>
     </div>
@@ -129,54 +125,23 @@ export class AtelierKanbanComponent implements OnInit {
     { id: 'LIVRE', title: 'Livré', badgeColor: 'bg-emerald-950 text-emerald-400 border border-emerald-800', icon: '✅' }
   ];
 
+  connectedDropLists = ['TISSU_RECU', 'EN_COUTURE', 'PRET_POUR_ESSAYAGE', 'LIVRE'];
+
   ngOnInit(): void {
-    // Initialise avec des données de démonstration réactives
-    this.orderService.setInitialMockOrders([
-      {
-        id: 'cmd-1',
-        reference: 'CMD-2026-001',
-        carnetMesureId: 'carnet-1',
-        statut: 'TISSU_RECU',
-        prixTotal: 50000,
-        acompteVerse: 20000,
-        soldeRestant: 30000,
-        description: 'Robe de mariage Bazin brodé',
-        dateCommande: '2026-08-01',
-        dateLivraisonPrevue: '2026-08-15'
-      },
-      {
-        id: 'cmd-2',
-        reference: 'CMD-2026-002',
-        carnetMesureId: 'carnet-2',
-        statut: 'EN_COUTURE',
-        prixTotal: 35000,
-        acompteVerse: 35000,
-        soldeRestant: 0,
-        description: 'Ensemble Wax 2 Pièces',
-        dateCommande: '2026-08-03',
-        dateLivraisonPrevue: '2026-08-12'
-      },
-      {
-        id: 'cmd-3',
-        reference: 'CMD-2026-003',
-        carnetMesureId: 'carnet-3',
-        statut: 'PRET_POUR_ESSAYAGE',
-        prixTotal: 40000,
-        acompteVerse: 40000,
-        soldeRestant: 0,
-        description: 'Tenue de soirée Soie brodée',
-        dateCommande: '2026-08-04',
-        dateLivraisonPrevue: '2026-08-10'
-      }
-    ]);
+    this.refresh();
   }
 
-  getOrdersForColumn(status: 'TISSU_RECU' | 'EN_COUTURE' | 'PRET_POUR_ESSAYAGE' | 'LIVRE'): OrderDto[] {
-    switch (status) {
+  refresh(): void {
+    this.orderService.fetchOrders();
+  }
+
+  getOrdersForColumn(columnId: 'TISSU_RECU' | 'EN_COUTURE' | 'PRET_POUR_ESSAYAGE' | 'LIVRE'): OrderDto[] {
+    switch (columnId) {
       case 'TISSU_RECU': return this.orderService.ordersTissuRecu();
       case 'EN_COUTURE': return this.orderService.ordersEnCouture();
       case 'PRET_POUR_ESSAYAGE': return this.orderService.ordersPretEssayage();
       case 'LIVRE': return this.orderService.ordersLivre();
+      default: return [];
     }
   }
 
@@ -185,18 +150,8 @@ export class AtelierKanbanComponent implements OnInit {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       const movedOrder = event.previousContainer.data[event.previousIndex];
+      if (!movedOrder) return;
 
-      // Règle métier stricte : Solde = 0 avant de passer à l'état LIVRE
-      if (targetStatus === 'LIVRE' && movedOrder.soldeRestant > 0) {
-        this.errorMessage.set(
-          `Impossible de livrer la commande ${movedOrder.reference}. Le solde restant (${movedOrder.soldeRestant} FCFA) doit être égal à 0.`
-        );
-        return;
-      }
-
-      this.clearError();
-
-      // Déplace visuellement dans le tableau CDK
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -204,21 +159,11 @@ export class AtelierKanbanComponent implements OnInit {
         event.currentIndex
       );
 
-      // Appelle le service réactif qui envoie le PATCH vers Spring Boot
       this.orderService.updateOrderStatus(movedOrder.id, targetStatus).subscribe({
         error: (err) => {
-          this.errorMessage.set(err.message || 'Erreur lors de la mise à jour.');
+          this.errorMessage.set(err.message);
         }
       });
     }
-  }
-
-  clearError(): void {
-    this.errorMessage.set(null);
-  }
-
-  refresh(): void {
-    // Si besoin, recharge depuis le backend
-    this.clearError();
   }
 }
