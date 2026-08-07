@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { HarmyApi } from './harmy-api';
+import { HarmyApiService as HarmyApi } from '@core/services/harmy-api.service';
 import { CommonModule } from '@angular/common';
 
 @Component({

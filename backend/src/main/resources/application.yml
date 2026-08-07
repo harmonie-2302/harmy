@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: harmy-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/harmy_swing}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:2025}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+jwt:
+  secret: ${JWT_SECRET:harmysewing_ultra_secure_secret_key_2026_production_grade_token_signature_512bits}
+  expiration: 86400000
+
+cloudflare:
+  r2:
+    endpoint: ${CLOUDFLARE_R2_ENDPOINT:https://c298de3d6c8cfa623f8a66bd2add5c36.r2.cloudflarestorage.com}
+    bucket: ${CLOUDFLARE_R2_BUCKET:harmyswing}
+    access-key: ${CLOUDFLARE_R2_ACCESS_KEY:1249f45c1b41d590d45ec67f0e9b52a4}
+    secret-key: ${CLOUDFLARE_R2_SECRET_KEY:b84716b6db57c710b383d50e87139c8882657cb9af31a2c514531c395057f42}
+    public-url: ${CLOUDFLARE_R2_PUBLIC_URL:https://pub-00e6de6a8f434bb58c97225f2b4bdd78.r2.dev}
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api/v1

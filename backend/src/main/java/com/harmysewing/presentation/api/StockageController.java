@@ -1,0 +1,62 @@
+package com.harmysewing.presentation.api;
+
+import com.harmysewing.application.ports.in.UploadImageInputPort;
+import com.harmysewing.application.ports.out.FileStoragePort;
+import com.harmysewing.domain.exceptions.DomainException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/storage")
+public class StockageController {
+
+    private final UploadImageInputPort uploadImageInputPort;
+    private final FileStoragePort fileStoragePort;
+
+    public StockageController(UploadImageInputPort uploadImageInputPort, FileStoragePort fileStoragePort) {
+        this.uploadImageInputPort = uploadImageInputPort;
+        this.fileStoragePort = fileStoragePort;
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UploadImageInputPort.Result> uploaderFichier(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new DomainException("Le fichier envoyé est vide.");
+        }
+
+        try {
+            UploadImageInputPort.Command command = new UploadImageInputPort.Command(
+                    file.getBytes(),
+                    file.getOriginalFilename(),
+                    file.getContentType()
+            );
+
+            UploadImageInputPort.Result result = uploadImageInputPort.executer(command);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+        } catch (IOException e) {
+            throw new DomainException("Impossible de lire les octets du fichier téléversé.", e);
+        }
+    }
+
+    @GetMapping("/{fileKey}")
+    public ResponseEntity<byte[]> telechargerFichier(@PathVariable String fileKey) {
+        byte[] fileBytes = fileStoragePort.downloadFile(fileKey);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileKey + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(fileBytes);
+    }
+
+    @DeleteMapping("/{fileKey}")
+    public ResponseEntity<Void> supprimerFichier(@PathVariable String fileKey) {
+        fileStoragePort.deleteFile(fileKey);
+        return ResponseEntity.noContent().build();
+    }
+}
