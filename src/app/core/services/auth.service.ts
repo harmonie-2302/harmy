@@ -6,6 +6,7 @@ export interface UserTokenPayload {
   role: 'COUTURIERE' | 'CLIENTE' | 'ADMIN';
   nom?: string;
   prenom?: string;
+  atelierId?: string;
 }
 
 @Injectable({

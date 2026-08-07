@@ -174,7 +174,7 @@ export class KenteInspirationsComponent implements OnInit {
   }
 
   loadFavorites() {
-    if (typeof window === 'undefined' || !window.localStorage) return;
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
     try {
       const stored = localStorage.getItem('kente_favorites');
       if (stored) {
