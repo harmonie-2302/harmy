@@ -7,26 +7,38 @@ import com.harmysewing.domain.models.Message;
 import com.harmysewing.infrastructure.messaging.dto.JoinRoomPayload;
 import com.harmysewing.infrastructure.messaging.dto.ReceiveMessagePayload;
 import com.harmysewing.infrastructure.messaging.dto.SendMessagePayload;
+import com.harmysewing.infrastructure.security.JwtTokenProvider;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class SocketModule {
 
     private final SocketIOServer server;
     private final EnvoyerMessageInputPort envoyerMessageInputPort;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public SocketModule(SocketIOServer server, EnvoyerMessageInputPort envoyerMessageInputPort) {
+    public SocketModule(SocketIOServer server, EnvoyerMessageInputPort envoyerMessageInputPort, JwtTokenProvider jwtTokenProvider) {
         this.server = server;
         this.envoyerMessageInputPort = envoyerMessageInputPort;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostConstruct
     public void startServer() {
         // Connexion client
         server.addConnectListener(client -> {
-            System.out.println("[Socket.IO] Client connecté: " + client.getSessionId());
+            String token = client.getHandshakeData().getSingleUrlParam("token");
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                UUID userId = jwtTokenProvider.getUserIdFromToken(token);
+                client.set("userId", userId);
+                System.out.println("[Socket.IO] Client authentifié avec le rôle " + jwtTokenProvider.getRoleFromToken(token) + " (User: " + userId + ")");
+            } else {
+                System.out.println("[Socket.IO] Client connecté: " + client.getSessionId());
+            }
         });
 
         // Déconnexion client
@@ -68,9 +80,10 @@ public class SocketModule {
             }
 
             // 1. Exécute le cas d'utilisation pour persister le message dans PostgreSQL
+            UUID senderId = payload.senderId() != null ? payload.senderId() : client.get("userId");
             EnvoyerMessageInputPort.Command command = new EnvoyerMessageInputPort.Command(
                     payload.roomId(),
-                    payload.senderId(),
+                    senderId,
                     payload.content()
             );
 

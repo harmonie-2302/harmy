@@ -37,9 +37,20 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // Mode de session Stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Gestion des exceptions d'authentification (401 au lieu de 403 par défaut)
+                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    String json = String.format(
+                        "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Session expirée ou non autorisée. Veuillez vous reconnecter.\",\"path\":\"%s\"}",
+                        java.time.LocalDateTime.now(),
+                        request.getRequestURI()
+                    );
+                    response.getWriter().write(json);
+                }))
                 // Autorisations de routes API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/api/auth/**", "/storage/**", "/error").permitAll()
+                        .requestMatchers("/auth/**", "/api/auth/**", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 // Ajout du filtre JWT avant le filtre standard UsernamePasswordAuthenticationFilter

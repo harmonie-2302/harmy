@@ -30,7 +30,7 @@ interface AuthResponse {
           <span class="inline-block p-3.5 rounded-2xl bg-gold-50 text-gold-600 mb-3 border border-gold-500/20">
             <span class="material-icons text-3xl">brush</span>
           </span>
-          <h1 class="serif-header text-3xl font-bold text-gray-900 tracking-wide">Harmy'sewing</h1>
+          <h1 class="serif-header text-3xl font-bold text-gray-900 tracking-wide">Harmy'Swing</h1>
           <p class="text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">Création de Compte Atelier & Cliente</p>
         </div>
 
@@ -86,7 +86,7 @@ interface AuthResponse {
               <input 
                 formControlName="telephone"
                 type="text" 
-                placeholder="Ex. +221 77 123 45 67"
+                placeholder="Ex. +243 81 123 4567"
                 class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-gold-500 text-xs">
             </div>
 

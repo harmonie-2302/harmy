@@ -1,6 +1,6 @@
 package com.harmysewing.presentation.dtos;
 
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDateTime;
@@ -8,15 +8,19 @@ import java.util.UUID;
 
 public record CreateCommandeRequest(
         String reference,
+        @JsonAlias({"clientId", "customerRefId"})
         UUID clientId,
         UUID atelierId,
-        @NotNull(message = "L'identifiant du carnet de mesures est obligatoire.")
+        @JsonAlias({"carnetMesureId", "measureBookId"})
         UUID carnetMesureId,
-        @NotNull(message = "Le prix total est obligatoire.")
+        @JsonAlias({"prixTotal", "total"})
         @PositiveOrZero(message = "Le prix total doit être positif ou nul.")
         Double prixTotal,
+        @JsonAlias({"acompteVerse", "deposit"})
         @PositiveOrZero(message = "L'acompte versé doit être positif ou nul.")
         Double acompteVerse,
+        @JsonAlias({"description", "modelCaption"})
         String description,
+        @JsonAlias({"dateLivraisonPrevue", "dueDate"})
         LocalDateTime dateLivraisonPrevue
 ) {}

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HarmyApiService as HarmyApi, Order, CustomerAtelier, FinanceSummary, Task } from '@core/services/harmy-api.service';
+import { Router } from '@angular/router';
+import { HarmyApiService as HarmyApi, Order, CustomerAtelier, Task, FinanceSummary } from '@core/services/harmy-api.service';
 import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
 
@@ -11,68 +11,62 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle">
+    <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-white min-h-screen">
       
       <!-- Guard Banner (If Not Authenticated) -->
       @if (!authService.isAuthenticated()) {
-        <div class="text-center py-16 max-w-xl mx-auto bg-white border border-gold-500/20 rounded-3xl pagne-card p-8">
+        <div class="text-center py-16 max-w-xl mx-auto bg-white border border-gold-500/20 rounded-3xl pagne-card p-8 shadow-xl">
           <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 border border-gold-500/30">
-            <span class="material-icons text-4xl">lock</span>
+            <span class="material-icons text-4xl">store</span>
           </span>
-          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace Atelier Privé</h2>
+          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace SaaS d'Atelier Couture</h2>
           <p class="text-xs text-gray-600 leading-relaxed font-light mb-6">
-            Cette section est exclusivement réservée aux maisons de couture connectées.
+            Connectez-vous avec votre compte Couturière pour accéder au tableau Kanban, carnet de mesures et suivi financier.
           </p>
           <button 
             (click)="router.navigate(['/auth/login'])"
             class="btn-gold px-6 py-3 text-xs font-bold shadow-md">
-            Se connecter à votre espace
+            Se connecter
           </button>
         </div>
       } @else {
 
-        <!-- Professional Suite Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-gold-500/20">
+        <!-- Dashboard Header -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-gray-100">
           <div>
-            <h1 class="serif-header text-2xl sm:text-3xl font-extrabold text-gray-900">
-              Espace Maison de Couture
-            </h1>
-            <p class="text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">
-              Pilotage, Carnet de Mesures & Kanban en temps réel
-            </p>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="material-icons text-gold-600">cutting</span>
+              <h1 class="serif-header text-2xl font-bold text-gray-900">Espace Suite Atelier</h1>
+            </div>
+            <p class="text-xs text-gray-500 font-light">Gestion globale de la production, fiches clientes & comptabilité</p>
           </div>
-          <div class="flex gap-2.5 flex-wrap">
-            <button 
-              (click)="activeTab.set('kanban')"
-              class="px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class]="activeTab() === 'kanban' ? 'btn-black' : 'bg-white text-gray-700 hover:bg-gold-50 border border-gold-500/20'">
-              <span class="material-icons text-sm text-gold-500">view_week</span> Kanban Commandes
-            </button>
-            <button 
-              (click)="activeTab.set('clients')"
-              class="px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class]="activeTab() === 'clients' ? 'btn-black' : 'bg-white text-gray-700 hover:bg-gold-50 border border-gold-500/20'">
-              <span class="material-icons text-sm text-gold-500">people</span> Mesures & Clients
-            </button>
-            <button 
-              (click)="activeTab.set('tasks')"
-              class="px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class]="activeTab() === 'tasks' ? 'btn-black' : 'bg-white text-gray-700 hover:bg-gold-50 border border-gold-500/20'">
-              <span class="material-icons text-sm text-gold-500">checklist</span> Tâches d'Atelier
-            </button>
-          </div>
-        </div>
 
-        <!-- Section: Finance Overview Widgets -->
+          <!-- Actions -->
+          <div class="flex gap-3">
+            <button 
+              (click)="openClientModal.set(true)"
+              class="px-4 py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition flex items-center gap-1.5">
+              <span class="material-icons text-sm">person_add</span>
+              <span>Nouvelle Cliente</span>
+            </button>
+            <button 
+              (click)="openOrderModal.set(true)"
+              class="btn-gold px-5 py-2.5 text-xs font-bold shadow-md flex items-center gap-1.5">
+              <span class="material-icons text-sm">add_shopping_cart</span>
+              <span>Créer une Commande</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Financial Summary Banner -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          
-          <div class="bg-gradient-to-br from-gold-50 to-white p-5 rounded-2xl border border-gold-500/30 custom-shadow">
+          <div class="bg-white p-5 rounded-2xl border border-gold-500/20 custom-shadow">
             <div class="flex items-center justify-between mb-2">
               <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Recettes Globales</span>
               <span class="material-icons text-gold-600 text-lg">account_balance_wallet</span>
             </div>
             <h3 class="text-xl font-bold text-gray-900 serif-header">
-              {{ finance()?.totalRevenue || 0 | number }} {{ finance()?.currency || 'FCFA' }}
+              {{ finance()?.totalRevenue || 0 | number }} {{ finance()?.currency || 'FC' }}
             </h3>
             <p class="text-[10px] text-gray-500 mt-1 font-light">Commandes livrées + acomptes</p>
           </div>
@@ -83,7 +77,7 @@ import { CommonModule } from '@angular/common';
               <span class="material-icons text-emerald-700 text-lg">monetization_on</span>
             </div>
             <h3 class="text-xl font-bold text-emerald-900 serif-header">
-              {{ finance()?.totalDeposits || 0 | number }} {{ finance()?.currency || 'FCFA' }}
+              {{ finance()?.totalDeposits || 0 | number }} {{ finance()?.currency || 'FC' }}
             </h3>
             <p class="text-[10px] text-emerald-800 mt-1 font-light">Garanties financières de production</p>
           </div>
@@ -94,7 +88,7 @@ import { CommonModule } from '@angular/common';
               <span class="material-icons text-red-500 text-lg">schedule</span>
             </div>
             <h3 class="text-xl font-bold text-gray-700 serif-header">
-              {{ finance()?.totalBalancesDue || 0 | number }} {{ finance()?.currency || 'FCFA' }}
+              {{ finance()?.totalBalancesDue || 0 | number }} {{ finance()?.currency || 'FC' }}
             </h3>
             <p class="text-[10px] text-gray-400 mt-1 font-light">À percevoir à la remise finale</p>
           </div>
@@ -111,103 +105,95 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-gray-100 mb-6 gap-8">
+          <button 
+            (click)="activeTab.set('kanban')"
+            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2"
+            [class]="activeTab() === 'kanban' ? 'border-gold-500 text-gold-700' : 'border-transparent text-gray-400 hover:text-gray-600'">
+            <span class="material-icons text-sm">view_kanban</span> Suivi Kanban
+          </button>
+          <button 
+            (click)="activeTab.set('clients')"
+            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2"
+            [class]="activeTab() === 'clients' ? 'border-gold-500 text-gold-700' : 'border-transparent text-gray-400 hover:text-gray-600'">
+            <span class="material-icons text-sm">group</span> Répertoire & Mesures Clientes
+          </button>
+          <button 
+            (click)="activeTab.set('tasks')"
+            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2"
+            [class]="activeTab() === 'tasks' ? 'border-gold-500 text-gold-700' : 'border-transparent text-gray-400 hover:text-gray-600'">
+            <span class="material-icons text-sm">task_alt</span> Tâches Atelier
+          </button>
+        </div>
+
         <!-- TAB CONTENT: KANBAN BOARD -->
         @if (activeTab() === 'kanban') {
-          <div class="mb-6 flex justify-between items-center flex-wrap gap-2">
-            <h2 class="serif-header text-lg font-bold text-gray-800 flex items-center gap-2">
-              <span class="material-icons text-mahogany-500 text-sm">layers</span> Suivi Kanban des Confections
-            </h2>
-            <button 
-              (click)="openOrderModal.set(true)"
-              class="bg-mahogany-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-mahogany-600 transition-all flex items-center gap-1">
-              <span class="material-icons text-xs">add</span> Nouvelle Commande
-            </button>
-          </div>
-
-          <!-- The Columns Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             
-            <!-- Column 1: Tissu Reçu (FABRIC_RECEIVED) -->
-            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex flex-col min-h-[450px]">
-              <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
-                <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full bg-blue-400"></span> Tissu Reçu
-                </span>
-                <span class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {{ ordersByStatus('FABRIC_RECEIVED').length }}
+            <!-- Column: Tissu Reçu -->
+            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span> Tissu Reçu
+                </h3>
+                <span class="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">
+                  {{ getOrdersByStatus('TISSU_RECU').length }}
                 </span>
               </div>
-              
-              <div class="space-y-3 flex-grow overflow-y-auto">
-                @for (o of ordersByStatus('FABRIC_RECEIVED'); track o.id) {
+              <div class="space-y-3">
+                @for (o of getOrdersByStatus('TISSU_RECU'); track o.id) {
                   <ng-container *ngTemplateOutlet="orderCard; context: { $implicit: o }"></ng-container>
                 }
               </div>
             </div>
 
-            <!-- Column 2: En Couture (SEWING) -->
-            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex flex-col min-h-[450px]">
-              <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
-                <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full bg-gold-500"></span> En Couture
-                </span>
-                <span class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {{ ordersByStatus('SEWING').length }}
+            <!-- Column: En Couture -->
+            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-orange-500"></span> En Couture
+                </h3>
+                <span class="text-[10px] bg-orange-100 text-orange-700 font-bold px-2 py-0.5 rounded-full">
+                  {{ getOrdersByStatus('EN_COUTURE').length }}
                 </span>
               </div>
-              <div class="space-y-3 flex-grow overflow-y-auto">
-                @for (o of ordersByStatus('SEWING'); track o.id) {
+              <div class="space-y-3">
+                @for (o of getOrdersByStatus('EN_COUTURE'); track o.id) {
                   <ng-container *ngTemplateOutlet="orderCard; context: { $implicit: o }"></ng-container>
                 }
               </div>
             </div>
 
-            <!-- Column 3: Prêt pour Essayage (FITTING_READY) -->
-            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex flex-col min-h-[450px]">
-              <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
-                <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full bg-purple-400"></span> Prêt Essayage
-                </span>
-                <span class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {{ ordersByStatus('FITTING_READY').length }}
+            <!-- Column: Prêt pour Essayage -->
+            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-purple-500"></span> Prêt Essayage
+                </h3>
+                <span class="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">
+                  {{ getOrdersByStatus('PRET_POUR_ESSAYAGE').length }}
                 </span>
               </div>
-              <div class="space-y-3 flex-grow overflow-y-auto">
-                @for (o of ordersByStatus('FITTING_READY'); track o.id) {
+              <div class="space-y-3">
+                @for (o of getOrdersByStatus('PRET_POUR_ESSAYAGE'); track o.id) {
                   <ng-container *ngTemplateOutlet="orderCard; context: { $implicit: o }"></ng-container>
                 }
               </div>
             </div>
 
-            <!-- Column 4: Livré (DELIVERED) -->
-            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex flex-col min-h-[450px]">
-              <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
-                <span class="text-xs font-bold text-gray-700 flex items-center gap-1">
+            <!-- Column: Livré -->
+            <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Livré
-                </span>
-                <span class="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {{ ordersByStatus('DELIVERED').length }}
-                </span>
-              </div>
-              <div class="space-y-3 flex-grow overflow-y-auto">
-                @for (o of ordersByStatus('DELIVERED'); track o.id) {
-                  <ng-container *ngTemplateOutlet="orderCard; context: { $implicit: o }"></ng-container>
-                }
-              </div>
-            </div>
-
-            <!-- Column 5: Archivé (ARCHIVED) -->
-            <div class="bg-gray-50/30 p-4 rounded-2xl border border-gray-100 flex flex-col min-h-[450px] opacity-75">
-              <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
-                <span class="text-xs font-bold text-gray-500 flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full bg-gray-400"></span> Archivé
-                </span>
-                <span class="bg-gray-200 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {{ ordersByStatus('ARCHIVED').length }}
+                </h3>
+                <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">
+                  {{ getOrdersByStatus('LIVRE').length }}
                 </span>
               </div>
-              <div class="space-y-3 flex-grow overflow-y-auto">
-                @for (o of ordersByStatus('ARCHIVED'); track o.id) {
+              <div class="space-y-3">
+                @for (o of getOrdersByStatus('LIVRE'); track o.id) {
                   <ng-container *ngTemplateOutlet="orderCard; context: { $implicit: o }"></ng-container>
                 }
               </div>
@@ -216,175 +202,231 @@ import { CommonModule } from '@angular/common';
           </div>
         }
 
-        <!-- TAB CONTENT: CUSTOMERS & MEASUREMENTS -->
+        <!-- TAB CONTENT: CLIENTS & MEASUREMENTS -->
         @if (activeTab() === 'clients') {
-          <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow mb-8">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
-              <div>
-                <h2 class="serif-header text-xl font-bold text-gray-900">
-                  Carnet Digital de Mesures Clients
-                </h2>
-                <p class="text-xs text-gray-500 font-light mt-0.5">
-                  Gestion centralisée des mensurations d'atelier
-                </p>
-              </div>
-              <button 
-                (click)="openClientModal.set(true); isEditingClient.set(null); clientForm.reset({ bust: 90, waist: 70, hips: 100, arm: 30 })"
-                class="btn-gold px-4 py-2 text-xs font-bold flex items-center gap-1">
-                <span class="material-icons text-sm">person_add</span> Ajouter un Client
-              </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 class="serif-header text-lg font-bold text-gray-900 mb-6">Répertoire des Fiches Clientes</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               @for (c of customers(); track c.id) {
-                <div class="p-4 bg-pagne-subtle/50 rounded-2xl border border-gray-100 hover:border-gold-500/30 transition-all">
-                  <div class="flex justify-between items-start mb-2">
+                <div class="bg-pagne-subtle p-5 rounded-2xl border border-gold-500/20 shadow-sm relative">
+                  <div class="flex justify-between items-start mb-3">
                     <div>
-                      <h4 class="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-                        {{ c.name }}
-                        @if (c.type === 'registered') {
-                          <span class="text-[9px] bg-gold-100 text-gold-800 font-bold px-1.5 py-0.5 rounded-full border border-gold-500/20">
-                            Compte Réseau
-                          </span>
-                        } @else {
-                          <span class="text-[9px] bg-gray-100 text-gray-600 font-bold px-1.5 py-0.5 rounded-full">
-                            Client Local
-                          </span>
-                        }
-                      </h4>
-                      <p class="text-[11px] text-gray-500 font-mono">{{ c.phone }}</p>
+                      <h3 class="font-bold text-sm text-gray-900">{{ c.name }}</h3>
+                      <span class="text-[10px] text-gray-500 font-mono">{{ c.phone }}</span>
                     </div>
                     <button 
                       (click)="editClient(c)"
-                      class="text-gold-600 hover:text-gold-800 text-xs font-bold">
+                      class="text-xs text-gold-600 font-bold hover:underline">
                       Éditer
                     </button>
                   </div>
+                  
+                  <p class="text-xs text-gray-600 font-light mb-4 line-clamp-2">{{ c.notes || 'Aucune note particulière.' }}</p>
 
-                  <!-- Measurements Grid -->
-                  <div class="grid grid-cols-4 gap-1.5 text-center my-3 bg-white p-2.5 rounded-xl border border-gold-500/10 text-[11px]">
-                    <div>
-                      <span class="block text-[9px] text-gray-400 font-bold uppercase">Poitrine</span>
-                      <strong class="text-gray-800">{{ c.measurements?.bust }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                  <div class="grid grid-cols-4 gap-2 text-center text-[10px] pt-3 border-t border-gold-500/10">
+                    <div class="bg-white p-2 rounded-lg">
+                      <span class="block text-gray-400 uppercase">Poitrine</span>
+                      <strong class="text-gray-800">{{ c.measurements?.bust }} cm</strong>
                     </div>
-                    <div>
-                      <span class="block text-[9px] text-gray-400 font-bold uppercase">Taille</span>
-                      <strong class="text-gray-800">{{ c.measurements?.waist }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                    <div class="bg-white p-2 rounded-lg">
+                      <span class="block text-gray-400 uppercase">Taille</span>
+                      <strong class="text-gray-800">{{ c.measurements?.waist }} cm</strong>
                     </div>
-                    <div>
-                      <span class="block text-[9px] text-gray-400 font-bold uppercase">Bassin</span>
-                      <strong class="text-gray-800">{{ c.measurements?.hips }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                    <div class="bg-white p-2 rounded-lg">
+                      <span class="block text-gray-400 uppercase">Hanches</span>
+                      <strong class="text-gray-800">{{ c.measurements?.hips }} cm</strong>
                     </div>
-                    <div>
-                      <span class="block text-[9px] text-gray-400 font-bold uppercase">Bras</span>
-                      <strong class="text-gray-800">{{ c.measurements?.arm }}</strong> <span class="text-[9px] text-gray-400">cm</span>
+                    <div class="bg-white p-2 rounded-lg">
+                      <span class="block text-gray-400 uppercase">Bras</span>
+                      <strong class="text-gray-800">{{ c.measurements?.arm }} cm</strong>
                     </div>
                   </div>
-
-                  @if (c.notes) {
-                    <p class="text-[11px] text-gray-600 italic line-clamp-2 bg-white/50 p-2 rounded-lg text-xs">
-                      "{{ c.notes }}"
-                    </p>
-                  }
                 </div>
               }
               @if (customers().length === 0) {
-                <div class="col-span-full py-8 text-center text-xs text-gray-400 italic">
-                  Aucun client enregistré dans la base de données.
+                <div class="col-span-full py-12 text-center text-xs text-gray-400 italic">
+                  Aucune fiche cliente enregistrée.
                 </div>
               }
             </div>
           </div>
         }
 
-        <!-- TAB CONTENT: TASKS & AGENDA -->
+        <!-- TAB CONTENT: TASKS -->
         @if (activeTab() === 'tasks') {
-          <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow mb-8">
-            <h2 class="serif-header text-xl font-bold text-gray-900 mb-4">Tâches d'Atelier & Agenda</h2>
-            
-            <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="flex gap-2 mb-6">
+          <div class="bg-white rounded-2xl border border-gray-100 p-6 max-w-3xl">
+            <h2 class="serif-header text-lg font-bold text-gray-900 mb-6">Tâches de Couture à Accomplir</h2>
+
+            <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="flex gap-3 mb-6">
               <input 
                 type="text" 
                 formControlName="title" 
-                placeholder="Ex: Acheter fil de soie dorée Bazin..." 
-                class="flex-grow px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
-              <button type="submit" class="btn-black px-4 py-2.5 text-xs font-bold">Ajouter Tâche</button>
+                placeholder="Ex. Acheter du fil doré, Repasser la doublure..." 
+                class="flex-grow px-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
+              <button 
+                type="submit" 
+                [disabled]="taskForm.invalid"
+                class="btn-gold px-5 py-2 text-xs font-bold shadow-sm disabled:opacity-50">
+                Ajouter
+              </button>
             </form>
 
             <div class="space-y-2">
               @for (t of tasks(); track t.id) {
-                <div class="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gold-50/30 transition-all">
+                <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between">
                   <div class="flex items-center gap-3">
                     <input 
                       type="checkbox" 
                       [checked]="t.completed" 
                       (change)="toggleTask(t.id)"
-                      class="rounded text-gold-500 focus:ring-gold-400">
-                    <span class="text-xs font-medium" [class.line-through]="t.completed" [class.text-gray-400]="t.completed" [class.text-gray-800]="!t.completed">
+                      class="rounded text-gold-600 focus:ring-gold-500">
+                    <span [class]="t.completed ? 'line-through text-gray-400 text-xs' : 'text-xs text-gray-800 font-medium'">
                       {{ t.title }}
                     </span>
                   </div>
-                  <button (click)="deleteTask(t.id)" class="text-red-400 hover:text-red-600 text-xs">
+                  <button (click)="deleteTask(t.id)" class="text-gray-400 hover:text-red-500">
                     <span class="material-icons text-sm">delete</span>
                   </button>
                 </div>
               }
               @if (tasks().length === 0) {
-                <p class="text-xs text-gray-400 italic text-center py-4">Aucune tâche en attente.</p>
+                <p class="text-xs text-gray-400 italic text-center py-6">Toutes les tâches ont été accomplies !</p>
               }
             </div>
           </div>
         }
 
       }
+
     </div>
 
-    <!-- Reusable Template: Order Card -->
-    <ng-template #orderCard let-o>
-      <div class="pagne-card bg-white p-3.5 rounded-2xl border border-gold-500/20 shadow-sm hover:shadow-md transition-all">
-        <div class="flex justify-between items-start gap-1 mb-2">
-          <div>
-            <span class="text-[10px] font-bold text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-500/20">
-              #{{ o.id.substring(0,6) }}
-            </span>
-            <h4 class="font-bold text-gray-900 text-xs mt-1">{{ o.customerName || 'Client' }}</h4>
-          </div>
-          
-          <button (click)="deleteOrder(o.id)" class="text-gray-400 hover:text-red-500 text-xs">
-            <span class="material-icons text-xs">delete</span>
-          </button>
+    <!-- MODAL: ORDER CREATION -->
+    @if (openOrderModal()) {
+      <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-gold-500/30 shadow-2xl">
+          <h2 class="serif-header text-lg font-bold text-gray-900 mb-4">Créer une Commande</h2>
+          <form [formGroup]="orderForm" (ngSubmit)="submitOrder()" class="space-y-3">
+            <div>
+              <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Cliente</label>
+              <select formControlName="customerRefId" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+                <option value="" disabled>Sélectionner une cliente</option>
+                @for (c of customers(); track c.id) {
+                  <option [value]="c.id">{{ c.name }} ({{ c.phone }})</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Description Modèle</label>
+              <input type="text" formControlName="modelCaption" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Prix Total (FC)</label>
+                <input type="number" formControlName="total" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Acompte Versé (FC)</label>
+                <input type="number" formControlName="deposit" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Date de Livraison Prévue</label>
+              <input type="date" formControlName="dueDate" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+            </div>
+            <div class="flex justify-end gap-2 pt-4">
+              <button type="button" (click)="openOrderModal.set(false)" class="px-4 py-2 text-xs font-bold text-gray-500">Annuler</button>
+              <button type="submit" [disabled]="orderForm.invalid" class="btn-gold px-5 py-2 text-xs font-bold shadow-sm">Créer la commande</button>
+            </div>
+          </form>
         </div>
+      </div>
+    }
 
-        <p class="text-[11px] text-gray-600 line-clamp-2 mb-2 font-light">
-          {{ o.modelCaption }}
+    <!-- MODAL: CLIENT CREATION / EDITION -->
+    @if (openClientModal()) {
+      <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-gold-500/30 shadow-2xl">
+          <h2 class="serif-header text-lg font-bold text-gray-900 mb-4">{{ isEditingClient() ? 'Modifier Fiche Cliente' : 'Nouvelle Cliente' }}</h2>
+          <form [formGroup]="clientForm" (ngSubmit)="submitClient()" class="space-y-3">
+            <div>
+              <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Nom Complet</label>
+              <input type="text" formControlName="name" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Téléphone</label>
+              <input type="text" formControlName="phone" placeholder="+243 81 000 0000" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Notes</label>
+              <input type="text" formControlName="notes" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+              <div>
+                <label class="block text-[9px] font-bold text-gray-600 uppercase mb-1">Poitrine</label>
+                <input type="number" formControlName="bust" class="w-full px-2 py-1.5 text-xs bg-gray-50 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold text-gray-600 uppercase mb-1">Taille</label>
+                <input type="number" formControlName="waist" class="w-full px-2 py-1.5 text-xs bg-gray-50 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold text-gray-600 uppercase mb-1">Hanches</label>
+                <input type="number" formControlName="hips" class="w-full px-2 py-1.5 text-xs bg-gray-50 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold text-gray-600 uppercase mb-1">Bras</label>
+                <input type="number" formControlName="arm" class="w-full px-2 py-1.5 text-xs bg-gray-50 border rounded-lg">
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-4">
+              <button type="button" (click)="openClientModal.set(false); isEditingClient.set(null)" class="px-4 py-2 text-xs font-bold text-gray-500">Annuler</button>
+              <button type="submit" [disabled]="clientForm.invalid" class="btn-gold px-5 py-2 text-xs font-bold shadow-sm">Enregistrer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- ORDER CARD REUSABLE TEMPLATE -->
+    <ng-template #orderCard let-o>
+      <div class="pagne-card bg-white p-4 rounded-xl border border-gold-500/20 shadow-sm space-y-2">
+        <div class="flex justify-between items-start">
+          <h4 class="font-bold text-xs text-gray-900">{{ o.customerName || 'Cliente' }}</h4>
+          <span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-gold-50 text-gold-800 border border-gold-500/30">
+            {{ o.status || o.statut }}
+          </span>
+        </div>
+        <p class="text-xs text-gray-600 font-light line-clamp-2">
+          {{ o.modelCaption || o.modelPostId || 'Confection sur mesure' }}
         </p>
 
         <!-- Pricing info -->
         <div class="bg-gray-50 p-2 rounded-xl border border-gray-100 text-[10px] space-y-1 mb-3">
           <div class="flex justify-between text-gray-500">
             <span>Total :</span>
-            <strong class="text-gray-800">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FCFA' }}</strong>
+            <strong class="text-gray-800">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FC' }}</strong>
           </div>
           <div class="flex justify-between text-emerald-700 font-bold">
             <span>Acompte :</span>
-            <span>{{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FCFA' }}</span>
+            <span>{{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FC' }}</span>
           </div>
           <div class="flex justify-between font-bold" [class]="o.pricing?.balance > 0 ? 'text-red-500' : 'text-emerald-600'">
             <span>Solde restant :</span>
-            <span>{{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FCFA' }}</span>
+            <span>{{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FC' }}</span>
           </div>
         </div>
 
         <!-- Status Change Dropdown -->
         <div class="flex gap-1.5 items-center">
           <select 
-            [value]="o.status"
+            [value]="o.status || o.statut"
             (change)="updateStatus(o.id, $any($event.target).value)"
             class="w-full px-2 py-1 text-[10px] font-bold bg-gray-50 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:border-gold-500">
-            <option value="FABRIC_RECEIVED">Tissu Reçu</option>
-            <option value="SEWING">En Couture</option>
-            <option value="FITTING_READY">Prêt Essayage</option>
-            <option value="DELIVERED">Livré</option>
+            <option value="TISSU_RECU">Tissu Reçu</option>
+            <option value="EN_COUTURE">En Couture</option>
+            <option value="PRET_POUR_ESSAYAGE">Prêt Essayage</option>
+            <option value="LIVRE">Livré</option>
             <option value="ARCHIVED">Archivé</option>
           </select>
         </div>
@@ -455,35 +497,15 @@ export class AtelierSuiteComponent implements OnInit {
     }
   }
 
-  ordersByStatus(status: string): Order[] {
-    return this.orders().filter(o => o.status === status);
+  getOrdersByStatus(status: string): Order[] {
+    return this.orders().filter(o => (o.status === status || o.statut === status));
   }
 
   async updateStatus(orderId: string, status: string) {
     try {
       const updated = await this.api.updateOrderStatus(orderId, status);
       this.orders.update(arr => arr.map(o => o.id === orderId ? updated : o));
-      this.refreshFinance();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async deleteOrder(id: string) {
-    if (!confirm('Voulez-vous annuler/supprimer cette commande ?')) return;
-    try {
-      await this.api.deleteOrder(id);
-      this.orders.update(arr => arr.filter(o => o.id !== id));
-      this.refreshFinance();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async refreshFinance() {
-    try {
-      const fin = await this.api.getFinanceSummary();
-      this.finance.set(fin);
+      this.loadData();
     } catch (e) {
       console.error(e);
     }
@@ -538,6 +560,38 @@ export class AtelierSuiteComponent implements OnInit {
       this.clientForm.reset();
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async submitOrder() {
+    if (this.orderForm.invalid) return;
+    const { customerRefId, modelCaption, total, deposit, dueDate } = this.orderForm.value;
+
+    let isoDueDate: string | undefined = undefined;
+    if (dueDate) {
+      isoDueDate = dueDate.includes('T') ? dueDate : `${dueDate}T00:00:00`;
+    }
+
+    try {
+      const newOrder = await this.api.createOrder({
+        customerRefId: customerRefId || '',
+        modelCaption: modelCaption || 'Confection sur mesure',
+        total: Number(total) || 0,
+        deposit: Number(deposit) || 0,
+        dueDate: isoDueDate,
+        fabricReceived: true
+      });
+      this.orders.update(arr => [newOrder, ...arr]);
+      this.openOrderModal.set(false);
+      this.orderForm.reset({
+        total: 35000,
+        deposit: 15000,
+        modelCaption: 'Confection sur mesure',
+        dueDate: '2026-08-20'
+      });
+      await this.loadData();
+    } catch (e) {
+      console.error('Erreur création commande:', e);
     }
   }
 

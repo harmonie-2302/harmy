@@ -7,8 +7,10 @@ import com.harmysewing.infrastructure.persistence.mappers.UserPersistenceMapper;
 import com.harmysewing.infrastructure.persistence.repositories.UserSpringDataRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class UserPersistenceAdapter implements UserRepositoryPort {
@@ -41,5 +43,13 @@ public class UserPersistenceAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByEmail(String email) {
         return userSpringDataRepository.existsByEmail(email);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userSpringDataRepository.findAll()
+                .stream()
+                .map(UserPersistenceMapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

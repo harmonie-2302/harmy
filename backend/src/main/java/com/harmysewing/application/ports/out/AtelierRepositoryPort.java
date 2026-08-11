@@ -9,4 +9,5 @@ public interface AtelierRepositoryPort {
     Atelier save(Atelier atelier);
     Optional<Atelier> findById(UUID id);
     Optional<Atelier> findByCouturiereId(UUID couturiereId);
+    java.util.List<Atelier> findAll();
 }

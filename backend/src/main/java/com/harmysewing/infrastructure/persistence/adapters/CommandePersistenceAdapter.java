@@ -35,6 +35,14 @@ public class CommandePersistenceAdapter implements CommandeRepositoryPort {
     }
 
     @Override
+    public List<Commande> findAll() {
+        return commandeSpringDataRepository.findAll()
+                .stream()
+                .map(CommandePersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Commande> findByAtelierId(UUID atelierId) {
         return commandeSpringDataRepository.findByAtelierId(atelierId)
                 .stream()

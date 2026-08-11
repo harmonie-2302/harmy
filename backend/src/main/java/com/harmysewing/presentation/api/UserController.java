@@ -7,7 +7,9 @@ import com.harmysewing.presentation.dtos.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -17,6 +19,15 @@ public class UserController {
 
     public UserController(UserRepositoryPort userRepositoryPort) {
         this.userRepositoryPort = userRepositoryPort;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> listerTousLesUtilisateurs() {
+        List<UserResponse> users = userRepositoryPort.findAll()
+                .stream()
+                .map(UserResponse::fromDomain)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")

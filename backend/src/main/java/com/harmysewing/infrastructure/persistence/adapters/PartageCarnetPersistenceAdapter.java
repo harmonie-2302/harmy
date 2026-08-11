@@ -7,8 +7,10 @@ import com.harmysewing.infrastructure.persistence.mappers.PartageCarnetPersisten
 import com.harmysewing.infrastructure.persistence.repositories.PartageCarnetSpringDataRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class PartageCarnetPersistenceAdapter implements PartageCarnetRepositoryPort {
@@ -35,5 +37,18 @@ public class PartageCarnetPersistenceAdapter implements PartageCarnetRepositoryP
     @Override
     public boolean existsByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId) {
         return partageCarnetSpringDataRepository.existsByCarnetMesureIdAndCouturiereId(carnetMesureId, couturiereId);
+    }
+
+    @Override
+    public List<PartageCarnet> findByCarnetMesureId(UUID carnetMesureId) {
+        return partageCarnetSpringDataRepository.findByCarnetMesureId(carnetMesureId)
+                .stream()
+                .map(PartageCarnetPersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId) {
+        partageCarnetSpringDataRepository.deleteByCarnetMesureIdAndCouturiereId(carnetMesureId, couturiereId);
     }
 }

@@ -59,10 +59,27 @@ export class AuthService {
 
   private decodeAndSetUser(token: string): void {
     try {
-      const payloadBase64 = token.split('.')[1];
-      if (payloadBase64) {
-        const decodedJson = atob(payloadBase64);
-        const user = JSON.parse(decodedJson) as UserTokenPayload;
+      const parts = token.split('.');
+      if (parts.length >= 2) {
+        let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) {
+          base64 += '=';
+        }
+        const decodedJson = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        const rawPayload = JSON.parse(decodedJson);
+        const user: UserTokenPayload = {
+          id: rawPayload.id || rawPayload.userId,
+          email: rawPayload.email || rawPayload.sub,
+          role: rawPayload.role,
+          nom: rawPayload.nom,
+          prenom: rawPayload.prenom,
+          atelierId: rawPayload.atelierId
+        };
         this.currentUserSignal.set(user);
       }
     } catch (e) {

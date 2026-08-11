@@ -29,10 +29,14 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
+        String idStr = userId != null ? userId.toString() : null;
+
         return Jwts.builder()
                 .subject(email)
+                .claim("email", email)
                 .claim("role", role)
-                .claim("userId", userId != null ? userId.toString() : null)
+                .claim("id", idStr)
+                .claim("userId", idStr)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())

@@ -6,7 +6,7 @@ export interface User {
   id: string;
   displayName: string;
   email: string;
-  role: 'seamstress' | 'customer' | 'admin';
+  role: 'COUTURIERE' | 'CLIENTE' | 'ADMIN';
   photoURL: string;
   phone: string;
   whatsapp: string;
@@ -22,6 +22,7 @@ export interface User {
 export interface Atelier {
   id: string;
   ownerId: string;
+  couturiereId?: string;
   name: string;
   location: { city: string; country: string };
   bio: string;
@@ -79,19 +80,20 @@ export interface Post {
 
 export interface Order {
   id: string;
-  atelierId: string;
-  customerRefId: string;
-  customerName: string;
-  customerPhone: string;
-  customerType: 'local' | 'registered';
-  modelPostId: string | null;
-  modelCaption: string;
-  status: 'FABRIC_RECEIVED' | 'SEWING' | 'FITTING_READY' | 'DELIVERED' | 'ARCHIVED';
-  fabricReceived: boolean;
-  dueDate: string;
-  pricing: { total: number; deposit: number; balance: number; currency: string };
-  timestamps: { createdAt: string; updatedAt: string; deliveredAt: string | null };
-  events: { type: string; byUserId: string; text: string; createdAt: string }[];
+  reference?: string;
+  atelierId?: string;
+  clientId?: string;
+  carnetMesureId?: string;
+  status: 'TISSU_RECU' | 'EN_COUTURE' | 'PRET_POUR_ESSAYAGE' | 'LIVRE';
+  statut?: 'TISSU_RECU' | 'EN_COUTURE' | 'PRET_POUR_ESSAYAGE' | 'LIVRE';
+  fabricReceived?: boolean;
+  dueDate?: string;
+  prixTotal?: number;
+  acompteVerse?: number;
+  soldeRestant?: number;
+  pricing?: { total: number; deposit: number; balance: number; currency: string };
+  timestamps?: { createdAt: string; updatedAt: string; deliveredAt: string | null };
+  events?: { type: string; byUserId: string; text: string; createdAt: string }[];
 }
 
 export interface Message {
@@ -148,6 +150,13 @@ export class HarmyApiService {
   // Signals réactifs pour l'état d'application (alimentés exclusivement par le backend)
   currentUser = signal<User | null>(null);
   allUsers = signal<User[]>([]);
+
+  // --- Storage R2 ---
+  async uploadFile(file: File): Promise<{ fileKey: string; fileUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return firstValueFrom(this.http.post<{ fileKey: string; fileUrl: string }>(`${this.baseUrl}/storage/upload`, formData));
+  }
 
   // --- Posts ---
   async getPosts(tag?: string): Promise<Post[]> {
@@ -285,5 +294,16 @@ export class HarmyApiService {
 
   async adminToggleAtelierSubscription(atelierId: string): Promise<unknown> {
     return firstValueFrom(this.http.put<unknown>(`${this.baseUrl}/admin/ateliers/${atelierId}/subscription`, {}));
+  }
+
+  async loadAllUsers(): Promise<User[]> {
+    try {
+      const users = await firstValueFrom(this.http.get<User[]>(`${this.baseUrl}/admin/users`));
+      this.allUsers.set(users || []);
+      return users || [];
+    } catch (e) {
+      console.error('Erreur chargement utilisateurs admin:', e);
+      return [];
+    }
   }
 }

@@ -131,15 +131,15 @@ import { CommonModule } from '@angular/common';
                       <p class="text-[10px] text-gray-500 font-light">{{ a.location?.city }}, {{ a.location?.country }}</p>
                     </div>
 
-                    @if (isSharingWith(a.id)) {
+                    @if (isSharingWith(a)) {
                       <button 
-                        (click)="toggleShareAccess(a.id, false)"
+                        (click)="toggleShareAccess(a, false)"
                         class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-500/20 hover:bg-red-100 hover:text-red-700 hover:border-red-500/20 transition-all flex items-center gap-1">
                         <span class="material-icons text-xs">check_circle</span> Accès Autorisé
                       </button>
                     } @else {
                       <button 
-                        (click)="toggleShareAccess(a.id, true)"
+                        (click)="toggleShareAccess(a, true)"
                         class="btn-black px-3 py-1.5 text-[10px] font-bold">
                         Partager
                       </button>
@@ -169,35 +169,35 @@ import { CommonModule } from '@angular/common';
                       <span class="text-[10px] font-bold text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-500/20">
                         Commande #{{ o.id.substring(0,6) }}
                       </span>
-                      <h3 class="font-bold text-gray-900 text-sm mt-1">{{ o.modelCaption || 'Confection sur mesure' }}</h3>
+                      <h3 class="font-bold text-gray-900 text-sm mt-1">{{ o.reference || 'Confection sur mesure' }}</h3>
                     </div>
-                    <span [class]="'text-xs font-bold px-3 py-1 rounded-full border ' + statusBadgeStyle(o.status)">
-                      {{ statusLabel(o.status) }}
+                    <span [class]="'text-xs font-bold px-3 py-1 rounded-full border ' + statusBadgeStyle(o.status || o.statut || '')">
+                      {{ statusLabel(o.status || o.statut || '') }}
                     </span>
                   </div>
 
                   <!-- Timeline Progress Bar -->
                   <div class="relative py-4">
                     <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
-                      <div [class]="'shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-500 ' + statusColor(o.status)"
-                           [style.width]="o.status === 'FABRIC_RECEIVED' ? '25%' : o.status === 'SEWING' ? '50%' : o.status === 'FITTING_READY' ? '75%' : '100%'">
+                      <div [class]="'shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-500 ' + statusColor(o.status || o.statut || '')"
+                           [style.width]="(o.status || o.statut) === 'TISSU_RECU' ? '25%' : (o.status || o.statut) === 'EN_COUTURE' ? '50%' : (o.status || o.statut) === 'PRET_POUR_ESSAYAGE' ? '75%' : '100%'">
                       </div>
                     </div>
 
                     <div class="grid grid-cols-4 text-center text-[10px] font-bold text-gray-500">
-                      <div [class.text-gold-700]="isPastOrEqual(o.status, 'FABRIC_RECEIVED')">1. Tissu Reçu</div>
-                      <div [class.text-gold-700]="isPastOrEqual(o.status, 'SEWING')">2. En Couture</div>
-                      <div [class.text-gold-700]="isPastOrEqual(o.status, 'FITTING_READY')">3. Prêt Essayage</div>
-                      <div [class.text-gold-700]="isPastOrEqual(o.status, 'DELIVERED')">4. Livré</div>
+                      <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'TISSU_RECU')">1. Tissu Reçu</div>
+                      <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'EN_COUTURE')">2. En Couture</div>
+                      <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'PRET_POUR_ESSAYAGE')">3. Prêt Essayage</div>
+                      <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'LIVRE')">4. Livré</div>
                     </div>
                   </div>
 
                   <!-- Payment Summary -->
                   <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs">
-                    <span class="text-gray-500 font-light">Total: <strong class="text-gray-900 font-bold">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FCFA' }}</strong></span>
-                    <span class="text-emerald-700 font-bold">Acompte: {{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FCFA' }}</span>
+                    <span class="text-gray-500 font-light">Total: <strong class="text-gray-900 font-bold">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FC' }}</strong></span>
+                    <span class="text-emerald-700 font-bold">Acompte: {{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FC' }}</span>
                     <span [class]="(o.pricing?.balance || 0) > 0 ? 'text-red-500 font-bold' : 'text-emerald-600 font-bold'">
-                      Solde Restant: {{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FCFA' }}
+                      Solde Restant: {{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FC' }}
                     </span>
                   </div>
                 </div>
@@ -264,15 +264,17 @@ export class ClientSpaceComponent implements OnInit {
     }
   }
 
-  isSharingWith(atelierId: string): boolean {
+  isSharingWith(atelier: Atelier): boolean {
     const book = this.measureBook();
     if (!book || !book.shares) return false;
-    return book.shares.includes(atelierId);
+    const targetId = atelier.couturiereId || atelier.ownerId || atelier.id;
+    return book.shares.includes(targetId) || book.shares.includes(atelier.id);
   }
 
-  async toggleShareAccess(atelierId: string, grant: boolean) {
+  async toggleShareAccess(atelier: Atelier, grant: boolean) {
     try {
-      const updatedBook = await this.api.toggleShare(atelierId, grant);
+      const targetId = atelier.couturiereId || atelier.ownerId || atelier.id;
+      const updatedBook = await this.api.toggleShare(targetId, grant);
       this.measureBook.set(updatedBook);
     } catch (e) {
       console.error(e);
@@ -301,37 +303,36 @@ export class ClientSpaceComponent implements OnInit {
 
   statusLabel(status: string): string {
     switch (status) {
-      case 'FABRIC_RECEIVED': return 'Tissu Reçu';
-      case 'SEWING': return 'En Couture';
-      case 'FITTING_READY': return 'Prêt pour Essayage';
-      case 'DELIVERED': return 'Livré';
-      case 'ARCHIVED': return 'Archivé';
+      case 'TISSU_RECU': return 'Tissu Reçu';
+      case 'EN_COUTURE': return 'En Couture';
+      case 'PRET_POUR_ESSAYAGE': return 'Prêt pour Essayage';
+      case 'LIVRE': return 'Livré';
       default: return status;
     }
   }
 
   statusBadgeStyle(status: string): string {
     switch (status) {
-      case 'FABRIC_RECEIVED': return 'bg-blue-100 text-blue-700';
-      case 'SEWING': return 'bg-orange-100 text-orange-700';
-      case 'FITTING_READY': return 'bg-purple-100 text-purple-700';
-      case 'DELIVERED': return 'bg-emerald-100 text-emerald-700';
+      case 'TISSU_RECU': return 'bg-blue-100 text-blue-700';
+      case 'EN_COUTURE': return 'bg-orange-100 text-orange-700';
+      case 'PRET_POUR_ESSAYAGE': return 'bg-purple-100 text-purple-700';
+      case 'LIVRE': return 'bg-emerald-100 text-emerald-700';
       default: return 'bg-gray-100 text-gray-500';
     }
   }
 
   statusColor(status: string): string {
     switch (status) {
-      case 'FABRIC_RECEIVED': return 'bg-blue-400';
-      case 'SEWING': return 'bg-orange-400';
-      case 'FITTING_READY': return 'bg-purple-400';
-      case 'DELIVERED': return 'bg-emerald-400';
+      case 'TISSU_RECU': return 'bg-blue-400';
+      case 'EN_COUTURE': return 'bg-orange-400';
+      case 'PRET_POUR_ESSAYAGE': return 'bg-purple-400';
+      case 'LIVRE': return 'bg-emerald-400';
       default: return 'bg-gray-400';
     }
   }
 
   isPastOrEqual(orderStatus: string, step: string): boolean {
-    const sequence = ['FABRIC_RECEIVED', 'SEWING', 'FITTING_READY', 'DELIVERED', 'ARCHIVED'];
+    const sequence = ['TISSU_RECU', 'EN_COUTURE', 'PRET_POUR_ESSAYAGE', 'LIVRE'];
     return sequence.indexOf(orderStatus) >= sequence.indexOf(step);
   }
 }

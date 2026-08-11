@@ -37,4 +37,12 @@ public class AtelierPersistenceAdapter implements AtelierRepositoryPort {
         return atelierSpringDataRepository.findByCouturiereId(couturiereId)
                 .map(AtelierPersistenceMapper::toDomain);
     }
+
+    @Override
+    public java.util.List<Atelier> findAll() {
+        return atelierSpringDataRepository.findAll()
+                .stream()
+                .map(AtelierPersistenceMapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

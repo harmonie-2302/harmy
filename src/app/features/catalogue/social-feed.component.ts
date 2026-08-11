@@ -112,7 +112,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               <img [src]="p.media?.[0]" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Modèle" referrerpolicy="no-referrer">
               
               <div class="absolute top-3 right-3 bg-noir-profond/80 backdrop-blur-md px-3 py-1 rounded-full text-gold-400 text-xs font-extrabold border border-gold-500/30 shadow-md">
-                {{ p.priceHint | number }} {{ p.currency || 'FCFA' }}
+                {{ p.priceHint | number }} {{ p.currency || 'FC' }}
               </div>
             </div>
 
@@ -188,7 +188,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Prix Estimé (FCFA)</label>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Prix Estimé (FC)</label>
                 <input 
                   type="number" 
                   formControlName="priceHint"
@@ -308,6 +308,23 @@ export class SocialFeedComponent implements OnInit {
       this.router.navigate(['/messagerie']);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      try {
+        const result = await this.api.uploadFile(file);
+        if (result && (result.fileUrl || result.fileKey)) {
+          this.postForm.patchValue({
+            mediaUrl: result.fileUrl || `http://localhost:8080/api/v1/storage/${result.fileKey}`
+          });
+        }
+      } catch (e) {
+        console.error('Erreur lors du téléversement vers Cloudflare R2:', e);
+      }
     }
   }
 

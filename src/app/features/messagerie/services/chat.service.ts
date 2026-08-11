@@ -1,6 +1,7 @@
-import { Injectable, signal, computed, OnDestroy } from '@angular/core';
+import { Injectable, signal, computed, OnDestroy, inject } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable, Subject } from 'rxjs';
+import { AuthService } from '@core/services/auth.service';
 
 export interface ChatMessage {
   id?: string;
@@ -16,6 +17,7 @@ export interface ChatMessage {
 })
 export class ChatService implements OnDestroy {
 
+  private authService = inject(AuthService);
   private socket!: Socket;
   private readonly SERVER_URL = 'http://localhost:9092'; // Endpoint Netty-SocketIO backend
 
@@ -37,8 +39,10 @@ export class ChatService implements OnDestroy {
   }
 
   private initSocketConnection(): void {
+    const token = this.authService.getToken();
     this.socket = io(this.SERVER_URL, {
       transports: ['websocket', 'polling'],
+      query: token ? { token } : {},
       autoConnect: true
     });
 

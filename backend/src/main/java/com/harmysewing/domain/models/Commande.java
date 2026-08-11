@@ -46,6 +46,21 @@ public class Commande {
         recalculerSolde();
     }
 
+    public Commande(UUID id, String reference, User client, Atelier atelier, CarnetMesure carnetMesure, StatutCommande statut, Double prixTotal, Double acompteVerse, Double soldeRestant, String description, LocalDateTime dateCommande, LocalDateTime dateLivraisonPrevue) {
+        this.id = id;
+        this.reference = reference;
+        this.client = client;
+        this.atelier = atelier;
+        this.carnetMesure = carnetMesure;
+        this.statut = statut != null ? statut : StatutCommande.TISSU_RECU;
+        this.prixTotal = prixTotal != null ? prixTotal : 0.0;
+        this.acompteVerse = acompteVerse != null ? acompteVerse : 0.0;
+        this.soldeRestant = soldeRestant != null ? soldeRestant : Math.max(0.0, this.prixTotal - this.acompteVerse);
+        this.description = description;
+        this.dateCommande = dateCommande != null ? dateCommande : LocalDateTime.now();
+        this.dateLivraisonPrevue = dateLivraisonPrevue;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -83,9 +98,6 @@ public class Commande {
     }
 
     public void setCarnetMesure(CarnetMesure carnetMesure) {
-        if (carnetMesure == null) {
-            throw new DomainException("Une commande nécessite un carnet de mesures valide.");
-        }
         this.carnetMesure = carnetMesure;
     }
 
@@ -94,8 +106,11 @@ public class Commande {
     }
 
     public void setStatut(StatutCommande statut) {
-        if (StatutCommande.LIVRE.equals(statut) && this.soldeRestant != null && this.soldeRestant > 0) {
-            throw new DomainException("Impossible de livrer la commande. Le solde restant doit être égal à 0 (solde actuel: " + this.soldeRestant + ").");
+        if (StatutCommande.LIVRE.equals(statut)) {
+            recalculerSolde();
+            if (this.soldeRestant != null && this.soldeRestant > 0) {
+                throw new DomainException("Impossible de livrer la commande. Le solde restant doit être égal à 0 (solde actuel: " + this.soldeRestant + ").");
+            }
         }
         this.statut = statut;
     }
@@ -126,6 +141,10 @@ public class Commande {
 
     public Double getSoldeRestant() {
         return soldeRestant;
+    }
+
+    public void setSoldeRestant(Double soldeRestant) {
+        this.soldeRestant = soldeRestant;
     }
 
     public String getDescription() {
@@ -176,8 +195,10 @@ public class Commande {
     }
 
     public void avancerStatutKanban() {
-        StatutCommande suivant = this.statut.getNextStatus();
-        setStatut(suivant);
+        if (this.statut != null) {
+            StatutCommande suivant = this.statut.getNextStatus();
+            setStatut(suivant);
+        }
     }
 
     @Override
@@ -191,16 +212,5 @@ public class Commande {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Commande{" +
-                "id=" + id +
-                ", reference='" + reference + '\'' +
-                ", statut=" + statut +
-                ", prixTotal=" + prixTotal +
-                ", soldeRestant=" + soldeRestant +
-                '}';
     }
 }

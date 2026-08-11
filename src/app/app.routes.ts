@@ -4,8 +4,7 @@ import { authGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'feed',
-    pathMatch: 'full'
+    loadComponent: () => import('./features/home/landing-home.component').then(m => m.LandingHomeComponent)
   },
   {
     path: 'auth',
@@ -55,6 +54,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'feed'
+    redirectTo: ''
   }
 ];

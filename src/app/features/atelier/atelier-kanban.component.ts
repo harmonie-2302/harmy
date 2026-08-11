@@ -91,9 +91,9 @@ export interface KanbanColumn {
                   </p>
 
                   <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-650">
-                    <span class="text-gray-400">Total: <strong class="text-white">{{ order.prixTotal | number }} FCFA</strong></span>
+                    <span class="text-gray-400">Total: <strong class="text-white">{{ order.prixTotal | number }} FC</strong></span>
                     <span [class]="order.soldeRestant > 0 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'">
-                      {{ order.soldeRestant > 0 ? 'Reste: ' + (order.soldeRestant | number) + ' FCFA' : 'Payé' }}
+                      {{ order.soldeRestant > 0 ? 'Reste: ' + (order.soldeRestant | number) + ' FC' : 'Payé' }}
                     </span>
                   </div>
                 </div>

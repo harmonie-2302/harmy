@@ -130,7 +130,8 @@ export class AdminPanelComponent implements OnInit {
     try {
       const [reps, shops] = await Promise.all([
         this.api.getReports(),
-        this.api.getAteliers()
+        this.api.getAteliers(),
+        this.api.loadAllUsers()
       ]);
       this.reports.set(reps || []);
       this.ateliers.set(shops || []);

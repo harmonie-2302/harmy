@@ -27,7 +27,7 @@ import { HarmyApiService as HarmyApi, Post } from '@core/services/harmy-api.serv
                     <span class="material-icons text-5xl text-gold-500/40">style</span>
                   }
                   <span class="absolute top-3 right-3 bg-noir-profond/80 text-gold-400 text-xs font-bold px-3 py-1 rounded-full border border-gold-500/30">
-                    {{ item.priceHint | number }} {{ item.currency || 'FCFA' }}
+                    {{ item.priceHint | number }} {{ item.currency || 'FC' }}
                   </span>
                 </div>
                 <div class="p-5">
