@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle">
+    <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle min-h-screen">
       
       <!-- Guard Banner (If Not Authenticated) -->
       @if (!authService.isAuthenticated()) {
@@ -19,9 +19,9 @@ import { CommonModule } from '@angular/common';
           <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 border border-gold-500/30">
             <span class="material-icons text-4xl">face</span>
           </span>
-          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace Personnel Cliente</h2>
+          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Espace Cliente Harmy'Swing</h2>
           <p class="text-xs text-gray-600 leading-relaxed font-light mb-6">
-            Cet espace vous permet de configurer votre carnet de mesures et de suivre en temps réel la confection de vos vêtements.
+            Connectez-vous à votre compte cliente pour gérer votre carnet de mesures, autoriser vos ateliers favoris et suivre vos confections en direct.
           </p>
           <button 
             (click)="router.navigate(['/auth/login'])"
@@ -38,21 +38,26 @@ import { CommonModule } from '@angular/common';
               Mon Espace Créations & Mesures
             </h1>
             <p class="text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">
-              Suivi de couture et partage de mensurations numériques
+              Harmy'Swing — Carnet de mensurations & suivi de confections
             </p>
           </div>
           <div class="flex gap-2.5 flex-wrap">
             <button 
+              (click)="openOrderModal.set(true)"
+              class="btn-gold px-4 py-2.5 rounded-2xl text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer">
+              <span class="material-icons text-sm">add_shopping_cart</span> Commander une Confection
+            </button>
+            <button 
               (click)="activeTab.set('measurements')"
               class="px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
               [class]="activeTab() === 'measurements' ? 'btn-black' : 'bg-white text-gray-700 hover:bg-gold-50 border border-gold-500/20'">
-              <span class="material-icons text-sm text-gold-500">accessibility</span> Mon Carnet de Mesures
+              <span class="material-icons text-sm text-gold-500">accessibility</span> Carnet de Mesures
             </button>
             <button 
               (click)="activeTab.set('tracking')"
               class="px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
               [class]="activeTab() === 'tracking' ? 'btn-black' : 'bg-white text-gray-700 hover:bg-gold-50 border border-gold-500/20'">
-              <span class="material-icons text-sm text-gold-500">local_shipping</span> Mes Confections & Suivi
+              <span class="material-icons text-sm text-gold-500">local_shipping</span> Mes Confections ({{ myOrders().length }})
             </button>
           </div>
         </div>
@@ -66,10 +71,10 @@ import { CommonModule } from '@angular/common';
               <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
                 <div>
                   <h2 class="serif-header text-xl font-bold text-gray-900">Mon Carnet de Mesures Privé</h2>
-                  <p class="text-xs text-gray-500 font-light mt-0.5">Vos dimensions sauvegardées (en Centimètres)</p>
+                  <p class="text-xs text-gray-500 font-light mt-0.5">Vos mensurations de haute couture (en Centimètres)</p>
                 </div>
                 <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
-                  <span class="material-icons text-xs">lock</span> 100% Chiffré & Contrôlé
+                  <span class="material-icons text-xs">lock</span> Accès Sécurisé
                 </span>
               </div>
 
@@ -93,7 +98,7 @@ import { CommonModule } from '@angular/common';
                   </div>
 
                   <div class="bg-pagne-subtle p-4 rounded-2xl border border-gray-100">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Tour de Bassin / Hanches (Hips)</label>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Tour de Hanches (Hips)</label>
                     <div class="relative">
                       <input type="number" formControlName="hips" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-900 focus:outline-none focus:border-gold-500">
                       <span class="absolute right-3 top-3 text-xs text-gray-400 font-bold">cm</span>
@@ -118,37 +123,49 @@ import { CommonModule } from '@angular/common';
               </form>
             </div>
 
-            <!-- Right Col: Sharing Permissions -->
-            <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow">
-              <h3 class="serif-header text-lg font-bold text-gray-900 mb-1">Autorisations de Partage</h3>
-              <p class="text-xs text-gray-500 font-light mb-6">Accordez ou révoquez l'accès direct de vos mesures aux maisons de couture partenaires.</p>
+            <!-- Right Col: Sharing & Reviews Permissions -->
+            <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow flex flex-col justify-between">
+              <div>
+                <h3 class="serif-header text-lg font-bold text-gray-900 mb-1">Maisons de Couture Partenaires</h3>
+                <p class="text-xs text-gray-500 font-light mb-6">Autorisez l'accès à votre carnet de mesures et déposez un avis après vos confections.</p>
 
-              <div class="space-y-4">
-                @for (a of ateliers(); track a.id) {
-                  <div class="p-3.5 rounded-2xl border border-gray-100 bg-pagne-subtle/30 flex items-center justify-between">
-                    <div>
-                      <h4 class="font-bold text-xs text-gray-900">{{ a.name }}</h4>
-                      <p class="text-[10px] text-gray-500 font-light">{{ a.location?.city }}, {{ a.location?.country }}</p>
+                <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
+                  @for (a of ateliers(); track a.id) {
+                    <div class="p-3.5 rounded-2xl border border-gray-100 bg-pagne-subtle/30 space-y-2">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <h4 class="font-bold text-xs text-gray-900">{{ a.name }}</h4>
+                          <p class="text-[10px] text-gray-500 font-light">{{ a.location.city }}, {{ a.location.country }}</p>
+                        </div>
+
+                        @if (isSharingWith(a)) {
+                          <button 
+                            (click)="toggleShareAccess(a, false)"
+                            class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-500/20 hover:bg-red-100 hover:text-red-700 hover:border-red-500/20 transition-all flex items-center gap-1">
+                            <span class="material-icons text-xs">check_circle</span> Accès Autorisé
+                          </button>
+                        } @else {
+                          <button 
+                            (click)="toggleShareAccess(a, true)"
+                            class="btn-black px-3 py-1.5 text-[10px] font-bold">
+                            Partager Mesures
+                          </button>
+                        }
+                      </div>
+
+                      <div class="flex justify-end pt-1 border-t border-gray-100">
+                        <button 
+                          (click)="openReviewForAtelier(a)"
+                          class="text-[10px] font-bold text-gold-700 hover:text-gold-800 flex items-center gap-1">
+                          <span class="material-icons text-xs text-gold-500">star</span> Laisser un avis
+                        </button>
+                      </div>
                     </div>
-
-                    @if (isSharingWith(a)) {
-                      <button 
-                        (click)="toggleShareAccess(a, false)"
-                        class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-500/20 hover:bg-red-100 hover:text-red-700 hover:border-red-500/20 transition-all flex items-center gap-1">
-                        <span class="material-icons text-xs">check_circle</span> Accès Autorisé
-                      </button>
-                    } @else {
-                      <button 
-                        (click)="toggleShareAccess(a, true)"
-                        class="btn-black px-3 py-1.5 text-[10px] font-bold">
-                        Partager
-                      </button>
-                    }
-                  </div>
-                }
-                @if (ateliers().length === 0) {
-                  <p class="text-xs text-gray-400 italic text-center py-4">Aucun atelier partenaire enregistré.</p>
-                }
+                  }
+                  @if (ateliers().length === 0) {
+                    <p class="text-xs text-gray-400 italic text-center py-4">Aucun atelier partenaire enregistré.</p>
+                  }
+                </div>
               </div>
             </div>
 
@@ -158,8 +175,15 @@ import { CommonModule } from '@angular/common';
         <!-- TAB CONTENT: TRACKING ORDERS -->
         @if (activeTab() === 'tracking') {
           <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow mb-8">
-            <h2 class="serif-header text-xl font-bold text-gray-900 mb-2">Suivi de mes Confections en Temps Réel</h2>
-            <p class="text-xs text-gray-500 font-light mb-6">Suivez le statut de confection de vos tenues étape par étape.</p>
+            <div class="flex justify-between items-center mb-6">
+              <div>
+                <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Suivi de mes Confections en Temps Réel</h2>
+                <p class="text-xs text-gray-500 font-light">Statut d'avancement étape par étape de vos tenues sur mesure.</p>
+              </div>
+              <button (click)="openOrderModal.set(true)" class="btn-gold px-4 py-2 text-xs font-bold shadow flex items-center gap-1">
+                <span class="material-icons text-sm">add</span> Nouvelle Commande
+              </button>
+            </div>
 
             <div class="space-y-6">
               @for (o of myOrders(); track o.id) {
@@ -167,9 +191,9 @@ import { CommonModule } from '@angular/common';
                   <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                     <div>
                       <span class="text-[10px] font-bold text-gold-700 bg-gold-50 px-2 py-0.5 rounded-md border border-gold-500/20">
-                        Commande #{{ o.id.substring(0,6) }}
+                        Commande #{{ o.id.substring(0,8) }}
                       </span>
-                      <h3 class="font-bold text-gray-900 text-sm mt-1">{{ o.reference || 'Confection sur mesure' }}</h3>
+                      <h3 class="font-bold text-gray-900 text-sm mt-1">{{ o.reference || o.modelCaption || 'Confection sur mesure' }}</h3>
                     </div>
                     <span [class]="'text-xs font-bold px-3 py-1 rounded-full border ' + statusBadgeStyle(o.status || o.statut || '')">
                       {{ statusLabel(o.status || o.statut || '') }}
@@ -193,11 +217,11 @@ import { CommonModule } from '@angular/common';
                   </div>
 
                   <!-- Payment Summary -->
-                  <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs">
-                    <span class="text-gray-500 font-light">Total: <strong class="text-gray-900 font-bold">{{ o.pricing?.total || 0 }} {{ o.pricing?.currency || 'FC' }}</strong></span>
-                    <span class="text-emerald-700 font-bold">Acompte: {{ o.pricing?.deposit || 0 }} {{ o.pricing?.currency || 'FC' }}</span>
-                    <span [class]="(o.pricing?.balance || 0) > 0 ? 'text-red-500 font-bold' : 'text-emerald-600 font-bold'">
-                      Solde Restant: {{ o.pricing?.balance || 0 }} {{ o.pricing?.currency || 'FC' }}
+                  <div class="bg-white p-3.5 rounded-xl border border-gray-100 flex flex-wrap justify-between items-center text-xs gap-2">
+                    <span class="text-gray-500 font-light">Total: <strong class="text-gray-900 font-bold">{{ o.pricing?.total || o.prixTotal || 0 | number }} FC</strong></span>
+                    <span class="text-emerald-700 font-bold">Acompte: {{ o.pricing?.deposit || o.acompteVerse || 0 | number }} FC</span>
+                    <span [class]="(o.pricing?.balance ?? o.soldeRestant ?? 0) > 0 ? 'text-red-500 font-bold' : 'text-emerald-600 font-bold'">
+                      Solde Restant: {{ o.pricing?.balance ?? o.soldeRestant ?? 0 | number }} FC
                     </span>
                   </div>
                 </div>
@@ -207,6 +231,104 @@ import { CommonModule } from '@angular/common';
                   Aucune commande enregistrée pour votre compte.
                 </div>
               }
+            </div>
+          </div>
+        }
+
+        <!-- MODAL 1: DEMANDE DE CONFECTION SUR MESURE -->
+        @if (openOrderModal()) {
+          <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-gold-500/40 shadow-2xl relative">
+              <button (click)="openOrderModal.set(false)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
+                <span class="material-icons text-xl">close</span>
+              </button>
+
+              <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Nouvelle Commande sur Mesure</h2>
+              <p class="text-xs text-gray-500 font-light mb-6">Confiez votre projet de tenue à l'un des ateliers partenaires Harmy'Swing.</p>
+
+              <form [formGroup]="orderForm" (ngSubmit)="createOrderSubmit()">
+                <div class="space-y-4 mb-6">
+                  <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Choisir la Maison de Couture</label>
+                    <select formControlName="atelierId" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
+                      <option value="">Sélectionner un atelier...</option>
+                      @for (a of ateliers(); track a.id) {
+                        <option [value]="a.id">{{ a.name }} ({{ a.location.city }})</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description / Modèle de Tenue</label>
+                    <input type="text" formControlName="modelCaption" placeholder="Ex. Robe sirène en Pagne Wax avec broderies d'or" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Budget Total (FC)</label>
+                      <input type="number" formControlName="total" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Acompte Proposé (FC)</label>
+                      <input type="number" formControlName="deposit" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Date d'Essayage / Livraison Souhaitée</label>
+                    <input type="date" formControlName="dueDate" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
+                  </div>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                  <button type="button" (click)="openOrderModal.set(false)" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Annuler</button>
+                  <button type="submit" class="btn-gold px-5 py-2 text-xs font-bold shadow-md">Envoyer la Commande</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        }
+
+        <!-- MODAL 2: AVIS & EVALUATION ATELIER -->
+        @if (openReviewModal() && selectedAtelier()) {
+          <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-gold-500/40 shadow-2xl relative">
+              <button (click)="openReviewModal.set(false)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
+                <span class="material-icons text-xl">close</span>
+              </button>
+
+              <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Évaluer {{ selectedAtelier()?.name }}</h2>
+              <p class="text-xs text-gray-500 font-light mb-6">Partagez votre expérience de couture avec la communauté Harmy'Swing.</p>
+
+              <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+                <div class="space-y-4 mb-6">
+                  <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Note de Satisfaction</label>
+                    <div class="flex items-center gap-2">
+                      @for (star of [1,2,3,4,5]; track star) {
+                        <button 
+                          type="button" 
+                          (click)="reviewForm.patchValue({ rating: star })"
+                          class="text-2xl transition transform hover:scale-110"
+                          [class.text-gold-500]="(reviewForm.value.rating ?? 5) >= star"
+                          [class.text-gray-300]="(reviewForm.value.rating ?? 5) < star">
+                          ★
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Votre Commentaire</label>
+                    <textarea formControlName="text" rows="4" placeholder="Qualité des finitions, respect des délais, accueil..." class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-gold-500"></textarea>
+                  </div>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                  <button type="button" (click)="openReviewModal.set(false)" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Annuler</button>
+                  <button type="submit" class="btn-gold px-5 py-2 text-xs font-bold shadow-md">Publier l'Avis</button>
+                </div>
+              </form>
             </div>
           </div>
         }
@@ -227,11 +349,28 @@ export class ClientSpaceComponent implements OnInit {
   measureBook = signal<MeasureBook | null>(null);
   ateliers = signal<Atelier[]>([]);
 
+  openOrderModal = signal(false);
+  openReviewModal = signal(false);
+  selectedAtelier = signal<Atelier | null>(null);
+
   measureForm = this.fb.group({
     bust: [90, [Validators.required, Validators.min(0)]],
     waist: [70, [Validators.required, Validators.min(0)]],
     hips: [100, [Validators.required, Validators.min(0)]],
     arm: [30, [Validators.required, Validators.min(0)]]
+  });
+
+  orderForm = this.fb.group({
+    atelierId: ['', Validators.required],
+    modelCaption: ['', Validators.required],
+    total: [150000, [Validators.required, Validators.min(1)]],
+    deposit: [50000, [Validators.required, Validators.min(0)]],
+    dueDate: ['']
+  });
+
+  reviewForm = this.fb.group({
+    rating: [5, Validators.required],
+    text: ['', [Validators.required, Validators.minLength(5)]]
   });
 
   ngOnInit() {
@@ -295,7 +434,47 @@ export class ClientSpaceComponent implements OnInit {
     try {
       const updated = await this.api.updateMyMeasureBook(measurements);
       this.measureBook.set(updated);
-      alert("Vos dimensions corporelles ont été enregistrées avec succès dans la base de données !");
+      alert("Vos mensurations ont été enregistrées avec succès dans Harmy'Swing !");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async createOrderSubmit() {
+    if (this.orderForm.invalid) return;
+    const val = this.orderForm.value;
+    try {
+      await this.api.createOrder({
+        atelierId: val.atelierId || undefined,
+        modelCaption: val.modelCaption || undefined,
+        total: Number(val.total) || 0,
+        deposit: Number(val.deposit) || 0,
+        dueDate: val.dueDate || undefined
+      });
+      this.openOrderModal.set(false);
+      this.orderForm.reset({ total: 150000, deposit: 50000 });
+      this.loadAllData();
+      alert("Votre demande de confection a été envoyée avec succès à la maison de couture !");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  openReviewForAtelier(atelier: Atelier) {
+    this.selectedAtelier.set(atelier);
+    this.reviewForm.reset({ rating: 5, text: '' });
+    this.openReviewModal.set(true);
+  }
+
+  async submitReview() {
+    if (this.reviewForm.invalid) return;
+    const atelier = this.selectedAtelier();
+    if (!atelier) return;
+    const { rating, text } = this.reviewForm.value;
+    try {
+      await this.api.addAtelierReview(atelier.id, Number(rating) || 5, text || '');
+      this.openReviewModal.set(false);
+      alert("Votre avis a été soumis avec succès ! Merci de contribuer à la communauté Harmy'Swing.");
     } catch (e) {
       console.error(e);
     }

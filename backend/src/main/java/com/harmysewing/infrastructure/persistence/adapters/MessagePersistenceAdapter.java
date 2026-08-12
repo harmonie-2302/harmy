@@ -8,6 +8,7 @@ import com.harmysewing.infrastructure.persistence.repositories.MessageSpringData
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,6 +30,18 @@ public class MessagePersistenceAdapter implements MessageRepositoryPort {
     @Override
     public List<Message> findByRoomId(String roomId) {
         return messageSpringDataRepository.findByRoomIdOrderByTimestampAsc(roomId)
+                .stream()
+                .map(MessagePersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Message> findByParticipant(UUID userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        return messageSpringDataRepository
+                .findByRoomIdContainingOrderByTimestampAsc(userId.toString())
                 .stream()
                 .map(MessagePersistenceMapper::toDomain)
                 .collect(Collectors.toList());

@@ -1,9 +1,12 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@core/services/auth.service';
+import { HarmyApiService } from '@core/services/harmy-api.service';
+import { API_BASE_URL } from '@core/config/api.config';
+import { homeForRole } from '@core/guards/role.guard';
 
 interface AuthResponse {
   token: string;
@@ -29,9 +32,15 @@ interface AuthResponse {
           <span class="p-3 rounded-2xl bg-gold-50 text-gold-600 inline-block mb-3 border border-gold-500/20">
             <span class="material-icons text-3xl">lock</span>
           </span>
-          <h2 class="serif-header text-3xl font-extrabold text-gray-900">Harmy'sewing</h2>
+          <h2 class="serif-header text-3xl font-extrabold text-gray-900">Harmy'Swing</h2>
           <p class="text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">Connexion Haute Couture</p>
         </div>
+
+        @if (sessionExpired() && !error()) {
+          <div class="mb-6 p-3.5 bg-gold-50 text-gold-800 rounded-2xl text-xs border border-gold-500/30 text-center font-medium">
+            Votre session a expiré. Merci de vous reconnecter.
+          </div>
+        }
 
         @if (error()) {
           <div class="mb-6 p-3.5 bg-red-50 text-red-700 rounded-2xl text-xs border border-red-200 text-center font-medium">
@@ -88,33 +97,43 @@ interface AuthResponse {
 export class LoginComponent {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private api = inject(HarmyApiService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   email = '';
   password = '';
   loading = signal(false);
   error = signal<string | null>(null);
 
+  /** Renseigné par l'intercepteur quand le jeton a expiré (401). */
+  sessionExpired = signal(this.route.snapshot.queryParamMap.get('expired') === '1');
+
   onLogin() {
     if (!this.email || !this.password) return;
     this.loading.set(true);
     this.error.set(null);
+    this.sessionExpired.set(false);
 
-    this.http.post<AuthResponse>('http://localhost:8080/api/v1/auth/login', {
+    this.http.post<AuthResponse>(`${API_BASE_URL}/auth/login`, {
       email: this.email,
       motDePasse: this.password
     }).subscribe({
-      next: (res) => {
+      next: async (res) => {
         this.authService.setToken(res.token);
-        this.loading.set(false);
-        const role = res.user?.role;
-        if (role === 'COUTURIERE') {
-          this.router.navigate(['/atelier']);
-        } else if (role === 'CLIENTE') {
-          this.router.navigate(['/client']);
-        } else {
-          this.router.navigate(['/catalogue']);
+
+        // Profil réel récupéré immédiatement : aucune donnée locale inventée.
+        let role = res.user?.role ?? this.authService.currentUser()?.role;
+        try {
+          const me = await this.api.getMe();
+          role = me.role;
+        } catch {
+          // Le rôle du JWT suffit pour orienter la navigation.
         }
+
+        this.loading.set(false);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        this.router.navigateByUrl(returnUrl || homeForRole(role));
       },
       error: (err) => {
         this.loading.set(false);

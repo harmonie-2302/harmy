@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@core/services/auth.service';
+import { HarmyApiService } from '@core/services/harmy-api.service';
+import { API_BASE_URL } from '@core/config/api.config';
+import { homeForRole } from '@core/guards/role.guard';
 import { CommonModule } from '@angular/common';
 
 interface AuthResponse {
@@ -132,7 +135,7 @@ interface AuthResponse {
             @if (loading()) {
               <span class="material-icons animate-spin text-sm">sync</span> Inscription en cours...
             } @else {
-              <span class="material-icons text-sm">person_add</span> Créer mon compte Harmy'sewing
+              <span class="material-icons text-sm">person_add</span> Créer mon compte Harmy'Swing
             }
           </button>
         </form>
@@ -151,7 +154,9 @@ interface AuthResponse {
 export class AuthGateComponent {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private api = inject(HarmyApiService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
 
   errorMessage = signal<string | null>(null);
@@ -163,26 +168,35 @@ export class AuthGateComponent {
     email: ['', [Validators.required, Validators.email]],
     motDePasse: ['', [Validators.required, Validators.minLength(6)]],
     telephone: [''],
-    role: ['CLIENTE', Validators.required]
+    role: [this.roleDemande(), Validators.required]
   });
+
+  /** La page d'accueil oriente l'inscription via ?role=COUTURIERE|CLIENTE. */
+  private roleDemande(): 'COUTURIERE' | 'CLIENTE' {
+    const demande = this.route.snapshot.queryParamMap.get('role');
+    return demande === 'COUTURIERE' ? 'COUTURIERE' : 'CLIENTE';
+  }
 
   onRegister() {
     if (this.registerForm.invalid) return;
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.http.post<AuthResponse>('http://localhost:8080/api/v1/auth/register', this.registerForm.value).subscribe({
-      next: (res) => {
+    this.http.post<AuthResponse>(`${API_BASE_URL}/auth/register`, this.registerForm.value).subscribe({
+      next: async (res) => {
         this.authService.setToken(res.token);
-        this.loading.set(false);
-        const role = res.user?.role;
-        if (role === 'COUTURIERE') {
-          this.router.navigate(['/atelier']);
-        } else if (role === 'CLIENTE') {
-          this.router.navigate(['/client']);
-        } else {
-          this.router.navigate(['/catalogue']);
+
+        let role = res.user?.role ?? this.authService.currentUser()?.role;
+        try {
+          const me = await this.api.getMe();
+          role = me.role;
+        } catch {
+          // Le rôle du JWT suffit pour orienter la navigation.
         }
+
+        this.loading.set(false);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        this.router.navigateByUrl(returnUrl || homeForRole(role));
       },
       error: (err) => {
         this.loading.set(false);

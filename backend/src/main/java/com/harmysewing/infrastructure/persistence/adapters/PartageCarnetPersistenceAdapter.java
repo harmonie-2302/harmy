@@ -48,6 +48,14 @@ public class PartageCarnetPersistenceAdapter implements PartageCarnetRepositoryP
     }
 
     @Override
+    public List<PartageCarnet> findByCouturiereId(UUID couturiereId) {
+        return partageCarnetSpringDataRepository.findByCouturiereId(couturiereId)
+                .stream()
+                .map(PartageCarnetPersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId) {
         partageCarnetSpringDataRepository.deleteByCarnetMesureIdAndCouturiereId(carnetMesureId, couturiereId);
     }

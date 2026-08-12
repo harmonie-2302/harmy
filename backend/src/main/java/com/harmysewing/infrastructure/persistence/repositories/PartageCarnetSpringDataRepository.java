@@ -13,5 +13,6 @@ public interface PartageCarnetSpringDataRepository extends JpaRepository<Partage
     Optional<PartageCarnetJpaEntity> findByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId);
     boolean existsByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId);
     List<PartageCarnetJpaEntity> findByCarnetMesureId(UUID carnetMesureId);
+    List<PartageCarnetJpaEntity> findByCouturiereId(UUID couturiereId);
     void deleteByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId);
 }

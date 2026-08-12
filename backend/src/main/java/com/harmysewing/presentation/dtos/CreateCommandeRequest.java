@@ -3,13 +3,21 @@ package com.harmysewing.presentation.dtos;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.PositiveOrZero;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Création d'une commande.
+ *
+ * {@code customerRefId} désigne une fiche cliente de l'atelier (table customers)
+ * et {@code clientId} un compte utilisateur : les deux identifiants ne partagent
+ * pas le même référentiel et ne doivent donc jamais être confondus.
+ * {@code dateLivraisonPrevue} est reçue en texte pour accepter aussi bien
+ * « 2026-08-20 » que « 2026-08-20T10:00:00 ».
+ */
 public record CreateCommandeRequest(
         String reference,
-        @JsonAlias({"clientId", "customerRefId"})
         UUID clientId,
+        UUID customerRefId,
         UUID atelierId,
         @JsonAlias({"carnetMesureId", "measureBookId"})
         UUID carnetMesureId,
@@ -22,5 +30,6 @@ public record CreateCommandeRequest(
         @JsonAlias({"description", "modelCaption"})
         String description,
         @JsonAlias({"dateLivraisonPrevue", "dueDate"})
-        LocalDateTime dateLivraisonPrevue
+        String dateLivraisonPrevue,
+        String modelPostId
 ) {}

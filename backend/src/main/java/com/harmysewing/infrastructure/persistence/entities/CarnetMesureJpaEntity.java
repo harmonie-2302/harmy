@@ -22,13 +22,16 @@ public class CarnetMesureJpaEntity {
     private UserJpaEntity cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "couturiere_id", nullable = false)
+    @JoinColumn(name = "couturiere_id")
     private UserJpaEntity couturiere;
+
+    @Column(name = "customer_id")
+    private UUID customerId;
 
     @Column(name = "est_local", nullable = false)
     private boolean estLocal;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "carnet_mesures_valeurs", joinColumns = @JoinColumn(name = "carnet_id"))
     @MapKeyColumn(name = "cle_mesure")
     @Column(name = "valeur_mesure")
@@ -44,6 +47,10 @@ public class CarnetMesureJpaEntity {
     }
 
     public CarnetMesureJpaEntity(UUID id, String nomClient, UserJpaEntity cliente, UserJpaEntity couturiere, boolean estLocal, Map<String, Double> mesures, LocalDateTime dateCreation, LocalDateTime dateModification) {
+        this(id, nomClient, cliente, couturiere, estLocal, mesures, dateCreation, dateModification, null);
+    }
+
+    public CarnetMesureJpaEntity(UUID id, String nomClient, UserJpaEntity cliente, UserJpaEntity couturiere, boolean estLocal, Map<String, Double> mesures, LocalDateTime dateCreation, LocalDateTime dateModification, UUID customerId) {
         this.id = id;
         this.nomClient = nomClient;
         this.cliente = cliente;
@@ -54,6 +61,15 @@ public class CarnetMesureJpaEntity {
         }
         this.dateCreation = dateCreation;
         this.dateModification = dateModification;
+        this.customerId = customerId;
+    }
+
+    public UUID getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(UUID customerId) {
+        this.customerId = customerId;
     }
 
     public UUID getId() {

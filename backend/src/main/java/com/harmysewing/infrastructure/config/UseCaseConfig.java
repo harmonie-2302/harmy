@@ -29,6 +29,12 @@ public class UseCaseConfig {
     }
 
     @Bean
+    public com.harmysewing.application.services.AtelierProvisioningService atelierProvisioningService(
+            AtelierRepositoryPort atelierRepositoryPort) {
+        return new com.harmysewing.application.services.AtelierProvisioningService(atelierRepositoryPort);
+    }
+
+    @Bean
     public MettreAJourStatutKanbanUseCase mettreAJourStatutKanbanUseCase(
             CommandeRepositoryPort commandeRepositoryPort) {
         return new MettreAJourStatutKanbanUseCase(commandeRepositoryPort);

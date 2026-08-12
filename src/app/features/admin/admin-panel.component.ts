@@ -33,7 +33,7 @@ import { CommonModule } from '@angular/common';
         <!-- Admin Suite Header -->
         <div class="mb-8 pb-6 border-b border-gray-100">
           <h1 class="serif-header text-2xl sm:text-3xl font-bold text-gray-900">
-            Console d'Administration Globale
+            Harmy'Swing — Console d'Administration Globale
           </h1>
           <p class="text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">
             Supervision du contenu, abonnements de couture & modération
@@ -69,7 +69,7 @@ import { CommonModule } from '@angular/common';
               <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
                 <div>
                   <h4 class="font-bold text-sm text-gray-900">{{ a.name }}</h4>
-                  <p class="text-xs text-gray-500 font-light">{{ a.location?.city }}, {{ a.location?.country }}</p>
+                  <p class="text-xs text-gray-500 font-light">{{ a.location.city }}, {{ a.location.country }}</p>
                 </div>
                 <div class="flex items-center gap-3">
                   <span [class]="getAtelierSubStatus(a) === 'active' ? 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700' : 'text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-700'">

@@ -51,6 +51,14 @@ public class CommandePersistenceAdapter implements CommandeRepositoryPort {
     }
 
     @Override
+    public List<Commande> findByClientId(UUID clientId) {
+        return commandeSpringDataRepository.findByClientId(clientId)
+                .stream()
+                .map(CommandePersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteById(UUID id) {
         commandeSpringDataRepository.deleteById(id);
     }

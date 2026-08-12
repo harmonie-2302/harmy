@@ -11,5 +11,6 @@ public interface CommandeRepositoryPort {
     Optional<Commande> findById(UUID id);
     List<Commande> findAll();
     List<Commande> findByAtelierId(UUID atelierId);
+    List<Commande> findByClientId(UUID clientId);
     void deleteById(UUID id);
 }

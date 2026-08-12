@@ -16,7 +16,11 @@ public class AtelierPersistenceMapper {
                 entity.getAdresse(),
                 entity.getTelephone(),
                 UserPersistenceMapper.toDomain(entity.getCouturiere()),
-                entity.getDateCreation()
+                entity.getDateCreation(),
+                entity.getVille(),
+                entity.getPays(),
+                entity.getPricing(),
+                entity.getPortfolioCoverUrl()
         );
     }
 
@@ -31,7 +35,11 @@ public class AtelierPersistenceMapper {
                 domain.getAdresse(),
                 domain.getTelephone(),
                 UserPersistenceMapper.toJpaEntity(domain.getCouturiere()),
-                domain.getDateCreation()
+                domain.getDateCreation(),
+                domain.getVille(),
+                domain.getPays(),
+                domain.getPricing(),
+                domain.getPortfolioCoverUrl()
         );
     }
 }

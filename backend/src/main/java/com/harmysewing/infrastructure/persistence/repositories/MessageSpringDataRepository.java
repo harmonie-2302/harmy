@@ -9,5 +9,13 @@ import java.util.UUID;
 
 @Repository
 public interface MessageSpringDataRepository extends JpaRepository<MessageJpaEntity, UUID> {
+
     List<MessageJpaEntity> findByRoomIdOrderByTimestampAsc(String roomId);
+
+    /**
+     * L'identifiant de salon encode les deux interlocuteurs
+     * ({@code room_<uuidA>_<uuidB>}) : rechercher le fragment permet de
+     * retrouver les échanges d'un utilisateur qu'il soit émetteur ou récepteur.
+     */
+    List<MessageJpaEntity> findByRoomIdContainingOrderByTimestampAsc(String fragment);
 }

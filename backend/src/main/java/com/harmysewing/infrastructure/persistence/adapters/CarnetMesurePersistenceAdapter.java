@@ -49,4 +49,21 @@ public class CarnetMesurePersistenceAdapter implements CarnetMesureRepositoryPor
                 .map(CarnetMesurePersistenceMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Optional<CarnetMesure> findByCustomerId(UUID customerId) {
+        return carnetMesureSpringDataRepository.findByCustomerId(customerId)
+                .map(CarnetMesurePersistenceMapper::toDomain);
+    }
+
+    @Override
+    public List<CarnetMesure> findByIds(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return carnetMesureSpringDataRepository.findAllById(ids)
+                .stream()
+                .map(CarnetMesurePersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

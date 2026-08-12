@@ -13,11 +13,20 @@ public class Atelier {
     private String telephone;
     private User couturiere;
     private LocalDateTime dateCreation;
+    private String ville;
+    private String pays;
+    private String pricing;
+    private String portfolioCoverUrl;
 
     public Atelier() {
     }
 
     public Atelier(UUID id, String nom, String description, String adresse, String telephone, User couturiere, LocalDateTime dateCreation) {
+        this(id, nom, description, adresse, telephone, couturiere, dateCreation, null, null, null, null);
+    }
+
+    public Atelier(UUID id, String nom, String description, String adresse, String telephone, User couturiere,
+                   LocalDateTime dateCreation, String ville, String pays, String pricing, String portfolioCoverUrl) {
         this.id = id;
         this.nom = nom;
         this.description = description;
@@ -25,6 +34,10 @@ public class Atelier {
         this.telephone = telephone;
         this.couturiere = couturiere;
         this.dateCreation = dateCreation;
+        this.ville = ville;
+        this.pays = pays;
+        this.pricing = pricing;
+        this.portfolioCoverUrl = portfolioCoverUrl;
     }
 
     public UUID getId() {
@@ -81,6 +94,38 @@ public class Atelier {
 
     public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
+    public String getPays() {
+        return pays;
+    }
+
+    public void setPays(String pays) {
+        this.pays = pays;
+    }
+
+    public String getPricing() {
+        return pricing;
+    }
+
+    public void setPricing(String pricing) {
+        this.pricing = pricing;
+    }
+
+    public String getPortfolioCoverUrl() {
+        return portfolioCoverUrl;
+    }
+
+    public void setPortfolioCoverUrl(String portfolioCoverUrl) {
+        this.portfolioCoverUrl = portfolioCoverUrl;
     }
 
     @Override

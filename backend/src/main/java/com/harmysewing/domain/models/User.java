@@ -14,11 +14,22 @@ public class User {
     private Role role;
     private String telephone;
     private LocalDateTime dateCreation;
+    private String photoUrl;
+    private String whatsapp;
+    private String subscriptionStatus = "inactive";
+    private String subscriptionPlan;
+    private LocalDateTime subscriptionRenewalDate;
 
     public User() {
     }
 
     public User(UUID id, String nom, String prenom, String email, String motDePasse, Role role, String telephone, LocalDateTime dateCreation) {
+        this(id, nom, prenom, email, motDePasse, role, telephone, dateCreation, null, null, "inactive", null, null);
+    }
+
+    public User(UUID id, String nom, String prenom, String email, String motDePasse, Role role, String telephone,
+                LocalDateTime dateCreation, String photoUrl, String whatsapp, String subscriptionStatus,
+                String subscriptionPlan, LocalDateTime subscriptionRenewalDate) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -27,6 +38,19 @@ public class User {
         this.role = role;
         this.telephone = telephone;
         this.dateCreation = dateCreation;
+        this.photoUrl = photoUrl;
+        this.whatsapp = whatsapp;
+        this.subscriptionStatus = subscriptionStatus != null ? subscriptionStatus : "inactive";
+        this.subscriptionPlan = subscriptionPlan;
+        this.subscriptionRenewalDate = subscriptionRenewalDate;
+    }
+
+    /** Nom d'affichage « Prénom Nom » utilisé par l'interface. */
+    public String getDisplayName() {
+        String p = prenom != null ? prenom.trim() : "";
+        String n = nom != null ? nom.trim() : "";
+        String complet = (p + " " + n).trim();
+        return complet.isBlank() ? email : complet;
     }
 
     public UUID getId() {
@@ -91,6 +115,46 @@ public class User {
 
     public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
+    }
+
+    public String getSubscriptionStatus() {
+        return subscriptionStatus;
+    }
+
+    public void setSubscriptionStatus(String subscriptionStatus) {
+        this.subscriptionStatus = subscriptionStatus;
+    }
+
+    public String getSubscriptionPlan() {
+        return subscriptionPlan;
+    }
+
+    public void setSubscriptionPlan(String subscriptionPlan) {
+        this.subscriptionPlan = subscriptionPlan;
+    }
+
+    public LocalDateTime getSubscriptionRenewalDate() {
+        return subscriptionRenewalDate;
+    }
+
+    public void setSubscriptionRenewalDate(LocalDateTime subscriptionRenewalDate) {
+        this.subscriptionRenewalDate = subscriptionRenewalDate;
     }
 
     public boolean isCouturiere() {

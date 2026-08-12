@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface OrderDto {
   id: string;
@@ -34,7 +35,7 @@ export interface CreateOrderRequest {
 export class OrderService {
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/v1/orders';
+  private apiUrl = `${API_BASE_URL}/orders`;
 
   // Signals réactifs pour l'état des commandes (initialement vide, alimenté exclusivement par le backend)
   private ordersSignal = signal<OrderDto[]>([]);

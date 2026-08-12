@@ -1,44 +1,56 @@
-# 🧵 Harmy'sewing - Plateforme de Couture Sur Mesure
+# 🧵 Harmy'Swing — Plateforme & Suite SaaS de Haute Couture Africaine
 
-Harmy'sewing est une application moderne de gestion et de commande de travaux de couture sur mesure, combinant une interface utilisateur fluide et réactive avec un backend robuste basé sur une architecture propre (Clean Architecture).
+**Harmy'Swing** est une application web moderne et élégante dédiée à la haute couture africaine sur mesure. Elle combine une marketplace sociale d'inspiration textile (Wax, Bazin Riche, Kente) avec une suite SaaS complète de gestion de production pour les ateliers de couture.
 
 ---
 
-## 🚀 Démarrage Rapide
+## 🌟 Fonctionnalités Clés
 
-Pour lancer le projet localement en quelques secondes :
+- **📸 Catalogue & Marketplace Sociale** : Publication de modèles sur mesure par les couturières, consultation par le public, likes et commentaires en temps réel.
+- **✂️ Suite Atelier & Tableau Kanban (Espace Couturière)** : Suivi des étapes de confection en Drag & Drop (Tissu reçu, En couture, Prêt essayage, Livré), comptabilité automatique en **FC** (Francs Congolais), carnet de clientes et gestion des tâches.
+- **📐 Mensurations & Carnet de Mesures (Espace Cliente)** : Carnet de mensurations privées (poitrine, taille, hanches, bras) avec contrôle granulaire des accès partagés aux maisons de couture partenaires.
+- **🛒 Demandes de Confections Sur Mesure** : Envoi de commandes personnalisées directement depuis l'espace cliente vers un atelier sélectionné.
+- **⭐ Système d'Avis & Évaluations** : Évaluation des prestations des ateliers (notes de 1 à 5 étoiles et commentaires authentifiés).
+- **💬 Messagerie Instantanée** : Échanges directs entre clientes et maître-couturiers.
+- **🛡️ Administration & Modération** : Console de supervision des utilisateurs, abonnements ateliers et modération du contenu.
+
+---
+
+## 🚀 Démarrage Rapide (En 3 Étapes)
 
 ### 1. Base de données PostgreSQL
-Assurez-vous que PostgreSQL est en cours d'exécution sur le port `5432` et exécutez :
+Créez la base de données dans votre instance PostgreSQL (port `5432`) :
 ```sql
 CREATE DATABASE harmy_swing;
 ```
 
-### 2. Démarrer le Backend (Spring Boot)
+### 2. Lancer le Backend (Spring Boot 3.2.3 / Java 17)
+Dans le dossier `backend` (utilisant le Maven autonome pré-intégré) :
 ```powershell
 cd backend
 .\maven\apache-maven-3.9.6\bin\mvn.cmd spring-boot:run
 ```
-L'API REST sera accessible sur `http://localhost:8080/api/v1`.
+*(Le backend s'exécute sur `http://localhost:8080/api/v1` et crée automatiquement les tables via Flyway)*.
 
-### 3. Démarrer le Frontend (Angular 21)
+### 3. Lancer le Frontend (Angular 21)
 À la racine du projet dans un second terminal :
 ```powershell
 npm start
 ```
-L'application web sera disponible sur `http://localhost:4200` (ou `http://localhost:3000` via `npm run dev`).
+*(L'application web s'ouvre sur `http://localhost:4200` ou `http://localhost:3000` via `npm run dev`)*.
 
 ---
 
-## 📚 Guide de Démarrage Détaillé
+## 📖 Documentation Complète
 
-Pour une explication pas-à-pas complète, la gestion des variables d'environnement, l'initialisation de la base de données et le dépannage des erreurs courantes, consultez le [GUIDE_DEMARRAGE.md](file:///c:/Users/NERIA%20FLORENTIN/Documents/harmy/GUIDE_DEMARRAGE.md).
+Pour consulter le guide d'installation détaillé, le fonctionnement de l'architecture Clean Architecture et le manuel d'utilisation complet de tous les espaces, consultez :
+👉 **[DOCUMENTATION.md](file:///c:/Users/NERIA%20FLORENTIN/Documents/harmy/DOCUMENTATION.md)**
 
 ---
 
-## 🛠️ Architecture & Technologies
+## 🛠️ Stack Technique
 
-- **Frontend** : Angular 21, Tailwind CSS v4, Signals, RxJS, Socket.IO Client.
-- **Backend** : Spring Boot 3.2.3 (Java 17), Spring Data JPA, Spring Security (JWT), Flyway, Netty Socket.IO, AWS SDK (Cloudflare R2).
-- **Base de Données** : PostgreSQL 15+.
-- **Build Tools** : Apache Maven 3.9.6 (embarqué dans `backend/maven`), Node.js & npm.
+- **Frontend** : Angular 21, Tailwind CSS, Angular Signals, RxJS, Socket.IO Client.
+- **Backend** : Java 17, Spring Boot 3.2.3, Spring Security (JWT), Spring Data JPA, Flyway Migration, AWS SDK (Cloudflare R2 Storage).
+- **Base de Données** : PostgreSQL.
+- **Devise du site** : FC (Francs Congolais).

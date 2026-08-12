@@ -51,6 +51,16 @@ public class SecurityConfig {
                 // Autorisations de routes API
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/api/auth/**", "/error").permitAll()
+                        // Lecture publique : la page d'accueil et le catalogue sont
+                        // consultables sans compte.
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        // L'atelier de la couturière connectée reste protégé : règle
+                        // déclarée avant le motif générique /ateliers/* (premier match gagnant).
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/ateliers/mine").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                "/posts", "/posts/**",
+                                "/ateliers", "/ateliers/*",
+                                "/ateliers/*/reviews").permitAll()
                         .anyRequest().authenticated()
                 )
                 // Ajout du filtre JWT avant le filtre standard UsernamePasswordAuthenticationFilter

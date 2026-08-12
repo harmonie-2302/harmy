@@ -11,4 +11,6 @@ public interface CarnetMesureRepositoryPort {
     Optional<CarnetMesure> findById(UUID id);
     List<CarnetMesure> findByCouturiereId(UUID couturiereId);
     List<CarnetMesure> findByClienteId(UUID clienteId);
+    Optional<CarnetMesure> findByCustomerId(UUID customerId);
+    List<CarnetMesure> findByIds(List<UUID> ids);
 }

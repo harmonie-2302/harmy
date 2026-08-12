@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface CarnetMesureSpringDataRepository extends JpaRepository<CarnetMesureJpaEntity, UUID> {
     List<CarnetMesureJpaEntity> findByCouturiereId(UUID couturiereId);
     List<CarnetMesureJpaEntity> findByClienteId(UUID clienteId);
+    java.util.Optional<CarnetMesureJpaEntity> findByCustomerId(UUID customerId);
 }

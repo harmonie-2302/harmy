@@ -27,16 +27,32 @@ public class ReviewJpaEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "author_id")
+    private UUID authorId;
+
     public ReviewJpaEntity() {
     }
 
     public ReviewJpaEntity(UUID id, UUID atelierId, String authorName, Integer rating, String text, LocalDateTime createdAt) {
+        this(id, atelierId, authorName, rating, text, createdAt, null);
+    }
+
+    public ReviewJpaEntity(UUID id, UUID atelierId, String authorName, Integer rating, String text, LocalDateTime createdAt, UUID authorId) {
         this.id = id;
         this.atelierId = atelierId;
         this.authorName = authorName;
         this.rating = rating != null ? rating : 5;
         this.text = text;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+        this.authorId = authorId;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(UUID authorId) {
+        this.authorId = authorId;
     }
 
     public UUID getId() {

@@ -18,11 +18,16 @@ public class CarnetMesure {
     private Map<String, Double> mesures = new HashMap<>();
     private LocalDateTime dateCreation;
     private LocalDateTime dateModification;
+    private UUID customerId;
 
     public CarnetMesure() {
     }
 
     public CarnetMesure(UUID id, String nomClient, User cliente, User couturiere, boolean estLocal, Map<String, Double> mesures, LocalDateTime dateCreation, LocalDateTime dateModification) {
+        this(id, nomClient, cliente, couturiere, estLocal, mesures, dateCreation, dateModification, null);
+    }
+
+    public CarnetMesure(UUID id, String nomClient, User cliente, User couturiere, boolean estLocal, Map<String, Double> mesures, LocalDateTime dateCreation, LocalDateTime dateModification, UUID customerId) {
         this.id = id;
         this.nomClient = nomClient;
         this.cliente = cliente;
@@ -33,6 +38,15 @@ public class CarnetMesure {
         }
         this.dateCreation = dateCreation;
         this.dateModification = dateModification;
+        this.customerId = customerId;
+    }
+
+    public UUID getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(UUID customerId) {
+        this.customerId = customerId;
     }
 
     public UUID getId() {

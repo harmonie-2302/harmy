@@ -11,5 +11,6 @@ public interface PartageCarnetRepositoryPort {
     Optional<PartageCarnet> findByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId);
     boolean existsByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId);
     List<PartageCarnet> findByCarnetMesureId(UUID carnetMesureId);
+    List<PartageCarnet> findByCouturiereId(UUID couturiereId);
     void deleteByCarnetMesureIdAndCouturiereId(UUID carnetMesureId, UUID couturiereId);
 }

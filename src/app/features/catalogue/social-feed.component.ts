@@ -4,16 +4,15 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HarmyApiService as HarmyApi, Post } from '@core/services/harmy-api.service';
 import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { KenteInspirationsComponent as KenteInspirations } from '@features/catalogue/kente-inspirations.component';
 import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-social-feed',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, KenteInspirations, ScrollFadeDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ScrollFadeDirective],
   template: `
-    <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle">
+    <div class="max-w-7xl mx-auto px-4 py-8 animate-fade-in bg-pagne-subtle min-h-screen">
       
       <!-- Hero Section / Editorial Banner -->
       <div class="relative bg-pagne-dark rounded-3xl overflow-hidden mb-12 custom-shadow-lg border border-gold-500/30">
@@ -42,7 +41,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               Savoir-Faire & Élégance Africaine
             </span>
             <h1 class="serif-header text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-4 tracking-tight">
-              L'Art de la Couture Africaine
+              Harmy'Swing — L'Art de la Couture Africaine
             </h1>
             <p class="text-sm sm:text-base text-gray-300 leading-relaxed font-light mb-6 max-w-xl">
               Découvrez les créations d'exception en Wax, Bazin, Kente et pagnes traditionnels confectionnées par nos maîtres couturiers.
@@ -51,13 +50,13 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               @if (authService.currentUser()?.role === 'COUTURIERE') {
                 <button 
                   (click)="openPostModal.set(true)"
-                  class="btn-gold px-5 py-3 text-sm font-bold flex items-center gap-2">
-                  <span class="material-icons text-sm">add_circle</span> Publier un modèle
+                  class="btn-gold px-5 py-3 text-sm font-bold flex items-center gap-2 shadow-lg">
+                  <span class="material-icons text-sm">add_circle</span> Publier un Nouveau Modèle
                 </button>
               } @else if (!authService.isAuthenticated()) {
                 <a 
                   routerLink="/auth/login"
-                  class="btn-gold px-5 py-3 text-sm font-bold flex items-center gap-2">
+                  class="btn-gold px-5 py-3 text-sm font-bold flex items-center gap-2 shadow-lg">
                   <span class="material-icons text-sm">login</span> Connexion
                 </a>
               }
@@ -109,7 +108,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
 
             <!-- Media Carousel / Image -->
             <div class="relative aspect-[4/3] bg-noir-profond overflow-hidden">
-              <img [src]="p.media?.[0]" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Modèle" referrerpolicy="no-referrer">
+              <img [src]="p.media[0]" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Modèle" referrerpolicy="no-referrer">
               
               <div class="absolute top-3 right-3 bg-noir-profond/80 backdrop-blur-md px-3 py-1 rounded-full text-gold-400 text-xs font-extrabold border border-gold-500/30 shadow-md">
                 {{ p.priceHint | number }} {{ p.currency || 'FC' }}
@@ -133,18 +132,69 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
                 </div>
               </div>
 
-              <!-- Action Bar -->
+              <!-- Action Bar (Like & Comments count) -->
               <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                 <div class="flex items-center gap-4">
+                  <!-- Like Button -->
                   <button 
                     (click)="toggleLike(p)"
-                    class="flex items-center gap-1 hover:text-gold-600 font-medium transition-colors"
+                    class="flex items-center gap-1.5 hover:text-gold-600 font-medium transition-colors cursor-pointer"
                     [class.text-gold-600]="isLikedByMe(p)">
                     <span class="material-icons text-base">{{ isLikedByMe(p) ? 'favorite' : 'favorite_border' }}</span>
-                    <span>{{ p.likeCount || 0 }}</span>
+                    <span>{{ p.likeCount || 0 }} J'aime</span>
+                  </button>
+
+                  <!-- Comments Toggle Button -->
+                  <button 
+                    (click)="toggleCommentsDrawer(p.id)"
+                    class="flex items-center gap-1.5 hover:text-gold-600 font-medium transition-colors cursor-pointer">
+                    <span class="material-icons text-base">chat_bubble_outline</span>
+                    <span>{{ p.comments.length || 0 }} Commentaires</span>
                   </button>
                 </div>
               </div>
+
+              <!-- Inline Comments Drawer -->
+              @if (activeCommentPostId() === p.id) {
+                <div class="mt-4 pt-3 border-t border-gold-500/10 space-y-3 animate-fade-in bg-pagne-subtle/50 p-3 rounded-2xl">
+                  <h4 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider">Commentaires</h4>
+                  
+                  <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                    @for (c of p.comments || []; track c.id) {
+                      <div class="p-2 bg-white rounded-xl border border-gray-100 text-xs">
+                        <div class="flex justify-between items-center mb-1">
+                          <strong class="text-gray-900 text-[11px]">{{ c.authorName }}</strong>
+                        </div>
+                        <p class="text-gray-600 font-light text-[11px]">{{ c.text }}</p>
+                      </div>
+                    }
+                    @if (!p.comments || p.comments.length === 0) {
+                      <p class="text-[10px] text-gray-400 italic">Aucun commentaire pour l'instant. Soyez le premier !</p>
+                    }
+                  </div>
+
+                  <!-- Add Comment Form -->
+                  @if (authService.isAuthenticated()) {
+                    <div class="flex gap-2 pt-2">
+                      <input 
+                        type="text" 
+                        #commentInput
+                        placeholder="Écrire un commentaire..." 
+                        class="flex-1 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-gold-500"
+                        (keyup.enter)="submitComment(p, commentInput.value); commentInput.value = ''">
+                      <button 
+                        (click)="submitComment(p, commentInput.value); commentInput.value = ''"
+                        class="btn-gold px-3 py-1.5 text-xs font-bold shadow">
+                        Envoyer
+                      </button>
+                    </div>
+                  } @else {
+                    <p class="text-[10px] text-gold-700 italic pt-1">
+                      <a routerLink="/auth/login" class="underline font-bold">Connectez-vous</a> pour réagir et publier un commentaire.
+                    </p>
+                  }
+                </div>
+              }
 
             </div>
 
@@ -156,9 +206,6 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
           </div>
         }
       </div>
-
-      <!-- Include Kente Inspirations Section -->
-      <app-kente-inspirations></app-kente-inspirations>
 
     </div>
 
@@ -173,12 +220,12 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             <span class="material-icons">close</span>
           </button>
 
-          <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Publier une Création</h2>
-          <p class="text-xs text-gray-500 mb-6">Mettez en valeur le savoir-faire de votre atelier.</p>
+          <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Publier une Création Haute Couture</h2>
+          <p class="text-xs text-gray-500 mb-6">Mettez en valeur le savoir-faire de votre atelier dans le catalogue Harmy'Swing.</p>
 
           <form [formGroup]="postForm" (ngSubmit)="submitPost()" class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Légende & Description</label>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Légende & Description du Modèle</label>
               <textarea 
                 formControlName="caption" 
                 rows="3" 
@@ -196,7 +243,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Tags (virgules)</label>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Tags (séparés par des virgules)</label>
                 <input 
                   type="text" 
                   formControlName="tagsInput" 
@@ -206,11 +253,19 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">URL de l'image de démonstration</label>
-              <input 
-                type="text" 
-                formControlName="mediaUrl"
-                class="w-full px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Image du Modèle</label>
+              <div class="space-y-2">
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gold-50 file:text-gold-700 hover:file:bg-gold-100">
+                <input 
+                  type="text" 
+                  formControlName="mediaUrl"
+                  placeholder="Ou collez directement une URL d'image"
+                  class="w-full px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
+              </div>
             </div>
 
             <div class="flex justify-end gap-3 pt-4">
@@ -243,6 +298,7 @@ export class SocialFeedComponent implements OnInit {
   posts = signal<Post[]>([]);
   selectedTag = signal<string>('all');
   openPostModal = signal(false);
+  activeCommentPostId = signal<string | null>(null);
 
   tags = [
     { id: 'all', label: 'Toutes les créations', icon: '✦' },
@@ -255,7 +311,7 @@ export class SocialFeedComponent implements OnInit {
   postForm = this.fb.group({
     caption: ['', Validators.required],
     priceHint: [25000, [Validators.required, Validators.min(0)]],
-    mediaUrl: ['', Validators.required],
+    mediaUrl: ['/hero_couture_dress.jpg', Validators.required],
     tagsInput: ['Wax, Robe']
   });
 
@@ -295,6 +351,25 @@ export class SocialFeedComponent implements OnInit {
     const me = this.authService.currentUser();
     if (!me || !post.likes) return false;
     return post.likes.includes(me.id);
+  }
+
+  toggleCommentsDrawer(postId: string) {
+    this.activeCommentPostId.update(current => current === postId ? null : postId);
+  }
+
+  async submitComment(post: Post, text: string) {
+    if (!text || !text.trim()) return;
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    try {
+      const updatedPost = await this.api.addComment(post.id, text.trim());
+      this.posts.update(arr => arr.map(p => p.id === post.id ? updatedPost : p));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async contactCouturiere(post: Post) {
@@ -345,7 +420,7 @@ export class SocialFeedComponent implements OnInit {
         [mediaUrl || '']
       );
       this.openPostModal.set(false);
-      this.postForm.reset();
+      this.postForm.reset({ priceHint: 25000, mediaUrl: '/hero_couture_dress.jpg', tagsInput: 'Wax, Robe' });
       await this.loadPosts();
     } catch (e) {
       console.error(e);

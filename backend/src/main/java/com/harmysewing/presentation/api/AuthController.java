@@ -1,7 +1,9 @@
 package com.harmysewing.presentation.api;
 
 import com.harmysewing.application.ports.out.UserRepositoryPort;
+import com.harmysewing.application.services.AtelierProvisioningService;
 import com.harmysewing.domain.exceptions.DomainException;
+import com.harmysewing.domain.models.Atelier;
 import com.harmysewing.domain.models.User;
 import com.harmysewing.infrastructure.security.JwtTokenProvider;
 import com.harmysewing.presentation.dtos.AuthResponse;
@@ -27,14 +29,17 @@ public class AuthController {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AtelierProvisioningService atelierProvisioningService;
 
     public AuthController(
             UserRepositoryPort userRepositoryPort,
             PasswordEncoder passwordEncoder,
-            JwtTokenProvider jwtTokenProvider) {
+            JwtTokenProvider jwtTokenProvider,
+            AtelierProvisioningService atelierProvisioningService) {
         this.userRepositoryPort = userRepositoryPort;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.atelierProvisioningService = atelierProvisioningService;
     }
 
     @PostMapping("/register")
@@ -55,10 +60,22 @@ public class AuthController {
         );
 
         User userEnregistre = userRepositoryPort.save(nouveauUser);
-        String token = jwtTokenProvider.generateToken(userEnregistre.getEmail(), userEnregistre.getRole().name(), userEnregistre.getId());
+
+        // Une couturière doit posséder un atelier dès l'inscription : clients,
+        // tâches, publications et commandes y sont rattachés par clé étrangère.
+        UUID atelierId = provisionnerAtelierSiCouturiere(userEnregistre);
+
+        String token = jwtTokenProvider.generateToken(
+                userEnregistre.getEmail(),
+                userEnregistre.getRole().name(),
+                userEnregistre.getId(),
+                userEnregistre.getNom(),
+                userEnregistre.getPrenom(),
+                atelierId
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new AuthResponse(token, UserResponse.fromDomain(userEnregistre)));
+                .body(new AuthResponse(token, UserResponse.fromDomain(userEnregistre, atelierId)));
     }
 
     @PostMapping("/login")
@@ -70,8 +87,26 @@ public class AuthController {
             throw new DomainException("Identifiants incorrects (mot de passe invalide).");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name(), user.getId());
+        // Rattrapage des comptes créés avant le provisionnement automatique.
+        UUID atelierId = provisionnerAtelierSiCouturiere(user);
 
-        return ResponseEntity.ok(new AuthResponse(token, UserResponse.fromDomain(user)));
+        String token = jwtTokenProvider.generateToken(
+                user.getEmail(),
+                user.getRole().name(),
+                user.getId(),
+                user.getNom(),
+                user.getPrenom(),
+                atelierId
+        );
+
+        return ResponseEntity.ok(new AuthResponse(token, UserResponse.fromDomain(user, atelierId)));
+    }
+
+    private UUID provisionnerAtelierSiCouturiere(User user) {
+        if (!user.isCouturiere()) {
+            return null;
+        }
+        Atelier atelier = atelierProvisioningService.assurerAtelier(user);
+        return atelier != null ? atelier.getId() : null;
     }
 }

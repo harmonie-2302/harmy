@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
           <span class="inline-block p-4 rounded-2xl bg-gold-50 text-gold-600 mb-4 border border-gold-500/30">
             <span class="material-icons text-4xl">chat_bubble_outline</span>
           </span>
-          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Messagerie Privée Sécurisée</h2>
+          <h2 class="serif-header text-2xl font-bold text-gray-900 mb-2">Messagerie Privée Harmy'Swing</h2>
           <p class="text-xs text-gray-600 leading-relaxed font-light mb-6">
             Vous devez être connecté(e) pour échanger des messages avec vos couturières ou clientes.
           </p>

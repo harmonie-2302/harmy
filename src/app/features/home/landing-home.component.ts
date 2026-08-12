@@ -373,9 +373,9 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             @for (p of featuredPosts().slice(0, 3); track p.id) {
               <div appScrollFade class="pagne-card bg-white rounded-3xl overflow-hidden border border-gold-500/20 shadow-md hover:shadow-xl transition-all group">
                 <div class="relative aspect-[3/4] overflow-hidden">
-                  <img [src]="p.media?.[0] || '/hero_couture_dress.jpg'" [alt]="p.caption" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                  <img [src]="p.media[0] || '/hero_couture_dress.jpg'" [alt]="p.caption" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                   <div class="absolute top-4 left-4 bg-noir-profond/90 border border-gold-500/50 backdrop-blur-sm px-3 py-1 rounded-xl text-[10px] font-bold text-gold-400">
-                    {{ p.tags?.[0] || 'Haute Couture' }}
+                    {{ p.tags[0] || 'Haute Couture' }}
                   </div>
                 </div>
                 <div class="p-6">

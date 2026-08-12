@@ -17,7 +17,12 @@ public class UserPersistenceMapper {
                 entity.getMotDePasse(),
                 entity.getRole(),
                 entity.getTelephone(),
-                entity.getDateCreation()
+                entity.getDateCreation(),
+                entity.getPhotoUrl(),
+                entity.getWhatsapp(),
+                entity.getSubscriptionStatus(),
+                entity.getSubscriptionPlan(),
+                entity.getSubscriptionRenewalDate()
         );
     }
 
@@ -33,7 +38,12 @@ public class UserPersistenceMapper {
                 domain.getMotDePasse(),
                 domain.getRole(),
                 domain.getTelephone(),
-                domain.getDateCreation()
+                domain.getDateCreation(),
+                domain.getPhotoUrl(),
+                domain.getWhatsapp(),
+                domain.getSubscriptionStatus(),
+                domain.getSubscriptionPlan(),
+                domain.getSubscriptionRenewalDate()
         );
     }
 }

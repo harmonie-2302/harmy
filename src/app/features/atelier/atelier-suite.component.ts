@@ -36,7 +36,7 @@ import { CommonModule } from '@angular/common';
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="material-icons text-gold-600">cutting</span>
-              <h1 class="serif-header text-2xl font-bold text-gray-900">Espace Suite Atelier</h1>
+              <h1 class="serif-header text-2xl font-bold text-gray-900">Harmy'Swing — Suite Atelier</h1>
             </div>
             <p class="text-xs text-gray-500 font-light">Gestion globale de la production, fiches clientes & comptabilité</p>
           </div>
@@ -227,19 +227,19 @@ import { CommonModule } from '@angular/common';
                   <div class="grid grid-cols-4 gap-2 text-center text-[10px] pt-3 border-t border-gold-500/10">
                     <div class="bg-white p-2 rounded-lg">
                       <span class="block text-gray-400 uppercase">Poitrine</span>
-                      <strong class="text-gray-800">{{ c.measurements?.bust }} cm</strong>
+                      <strong class="text-gray-800">{{ c.measurements.bust }} cm</strong>
                     </div>
                     <div class="bg-white p-2 rounded-lg">
                       <span class="block text-gray-400 uppercase">Taille</span>
-                      <strong class="text-gray-800">{{ c.measurements?.waist }} cm</strong>
+                      <strong class="text-gray-800">{{ c.measurements.waist }} cm</strong>
                     </div>
                     <div class="bg-white p-2 rounded-lg">
                       <span class="block text-gray-400 uppercase">Hanches</span>
-                      <strong class="text-gray-800">{{ c.measurements?.hips }} cm</strong>
+                      <strong class="text-gray-800">{{ c.measurements.hips }} cm</strong>
                     </div>
                     <div class="bg-white p-2 rounded-lg">
                       <span class="block text-gray-400 uppercase">Bras</span>
-                      <strong class="text-gray-800">{{ c.measurements?.arm }} cm</strong>
+                      <strong class="text-gray-800">{{ c.measurements.arm }} cm</strong>
                     </div>
                   </div>
                 </div>

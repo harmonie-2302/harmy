@@ -27,16 +27,32 @@ public class CommentJpaEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "author_id")
+    private UUID authorId;
+
     public CommentJpaEntity() {
     }
 
     public CommentJpaEntity(UUID id, UUID postId, String authorName, String authorAvatar, String text, LocalDateTime createdAt) {
+        this(id, postId, authorName, authorAvatar, text, createdAt, null);
+    }
+
+    public CommentJpaEntity(UUID id, UUID postId, String authorName, String authorAvatar, String text, LocalDateTime createdAt, UUID authorId) {
         this.id = id;
         this.postId = postId;
         this.authorName = authorName;
         this.authorAvatar = authorAvatar;
         this.text = text;
         this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+        this.authorId = authorId;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(UUID authorId) {
+        this.authorId = authorId;
     }
 
     public UUID getId() {

@@ -26,6 +26,10 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(String email, String role, UUID userId) {
+        return generateToken(email, role, userId, null, null, null);
+    }
+
+    public String generateToken(String email, String role, UUID userId, String nom, String prenom, UUID atelierId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
@@ -37,6 +41,9 @@ public class JwtTokenProvider {
                 .claim("role", role)
                 .claim("id", idStr)
                 .claim("userId", idStr)
+                .claim("nom", nom)
+                .claim("prenom", prenom)
+                .claim("atelierId", atelierId != null ? atelierId.toString() : null)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())

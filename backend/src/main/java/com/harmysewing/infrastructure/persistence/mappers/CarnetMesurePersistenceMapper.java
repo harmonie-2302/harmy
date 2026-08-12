@@ -17,7 +17,8 @@ public class CarnetMesurePersistenceMapper {
                 entity.isEstLocal(),
                 entity.getMesures(),
                 entity.getDateCreation(),
-                entity.getDateModification()
+                entity.getDateModification(),
+                entity.getCustomerId()
         );
     }
 
@@ -33,7 +34,8 @@ public class CarnetMesurePersistenceMapper {
                 domain.isEstLocal(),
                 domain.getMesures(),
                 domain.getDateCreation(),
-                domain.getDateModification()
+                domain.getDateModification(),
+                domain.getCustomerId()
         );
     }
 }
