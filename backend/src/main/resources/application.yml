@@ -19,16 +19,16 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret: ${JWT_SECRET:harmysewing_ultra_secure_secret_key_2026_production_grade_token_signature_512bits}
+  secret: ${JWT_SECRET:change-me-in-your-environment-with-a-long-random-secret}
   expiration: 86400000
 
 cloudflare:
   r2:
-    endpoint: ${CLOUDFLARE_R2_ENDPOINT:https://c298de3d6c8cfa623f8a66bd2add5c36.r2.cloudflarestorage.com}
-    bucket: ${CLOUDFLARE_R2_BUCKET:harmyswing}
-    access-key: ${CLOUDFLARE_R2_ACCESS_KEY:1249f45c1b41d590d45ec67f0e9b52a4}
-    secret-key: ${CLOUDFLARE_R2_SECRET_KEY:b84716b6db57c710b383d50e87139c8882657cb9af31a2c514531c395057f42}
-    public-url: ${CLOUDFLARE_R2_PUBLIC_URL:https://pub-00e6de6a8f434bb58c97225f2b4bdd78.r2.dev}
+    endpoint: ${CLOUDFLARE_R2_ENDPOINT:}
+    bucket: ${CLOUDFLARE_R2_BUCKET:}
+    access-key: ${CLOUDFLARE_R2_ACCESS_KEY:}
+    secret-key: ${CLOUDFLARE_R2_SECRET_KEY:}
+    public-url: ${CLOUDFLARE_R2_PUBLIC_URL:}
 
 server:
   port: ${PORT:8080}

@@ -1,0 +1,33 @@
+{
+  "name": "Harmy'Swing",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+  "remoteEnv": {
+    "SPRING_DATASOURCE_URL": "jdbc:postgresql://db:5432/harmy_swing",
+    "SPRING_DATASOURCE_USERNAME": "postgres",
+    "SPRING_DATASOURCE_PASSWORD": "postgres",
+    "JWT_SECRET": "codespaces-development-secret-change-before-production"
+  },
+  "postCreateCommand": "npm ci && (cd backend && mvn -q -DskipTests dependency:go-offline)",
+  "forwardPorts": [4200, 8080, 9092],
+  "portsAttributes": {
+    "4200": { "label": "Frontend Angular", "onAutoForward": "openPreview" },
+    "8080": { "label": "API Spring Boot", "onAutoForward": "notify" },
+    "9092": { "label": "Socket.IO", "onAutoForward": "silent" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Angular.ng-template",
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot"
+      ]
+    }
+  }
+}
