@@ -109,7 +109,7 @@ import { API_BASE_URL } from '@core/config/api.config';
 
             <!-- Media Carousel / Image -->
             <div class="relative aspect-[4/3] bg-noir-profond overflow-hidden">
-              <img [src]="p.media[0]" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Modèle" referrerpolicy="no-referrer">
+              <img [src]="p.media[0] || '/hero_couture_dress.jpg'" (error)="onImgError($event)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Modèle" referrerpolicy="no-referrer">
               
               <div class="absolute top-3 right-3 bg-noir-profond/80 backdrop-blur-md px-3 py-1 rounded-full text-gold-400 text-xs font-extrabold border border-gold-500/30 shadow-md">
                 {{ p.priceHint | number }} {{ p.currency || 'FC' }}
@@ -370,6 +370,13 @@ export class SocialFeedComponent implements OnInit {
       this.posts.update(arr => arr.map(p => p.id === post.id ? updatedPost : p));
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  onImgError(event: Event) {
+    const target = event.target as HTMLImageElement;
+    if (target && target.src !== '/hero_couture_dress.jpg') {
+      target.src = '/hero_couture_dress.jpg';
     }
   }
 

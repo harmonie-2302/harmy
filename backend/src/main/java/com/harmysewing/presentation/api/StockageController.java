@@ -48,9 +48,21 @@ public class StockageController {
     @GetMapping("/{fileKey}")
     public ResponseEntity<byte[]> telechargerFichier(@PathVariable String fileKey) {
         byte[] fileBytes = fileStoragePort.downloadFile(fileKey);
+        String lowerKey = fileKey.toLowerCase();
+        MediaType mediaType = MediaType.IMAGE_JPEG;
+        if (lowerKey.endsWith(".png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        } else if (lowerKey.endsWith(".webp")) {
+            mediaType = MediaType.parseMediaType("image/webp");
+        } else if (lowerKey.endsWith(".gif")) {
+            mediaType = MediaType.IMAGE_GIF;
+        } else if (lowerKey.endsWith(".svg")) {
+            mediaType = MediaType.parseMediaType("image/svg+xml");
+        }
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileKey + "\"")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileKey + "\"")
+                .contentType(mediaType)
                 .body(fileBytes);
     }
 
