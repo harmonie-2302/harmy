@@ -1,19 +1,5 @@
-Le frontend Angular actuel contient beaucoup de données statiques (mocks) et une interface de "simulation" (comme le menu déroulant "SIMULER : Utilisateur" dans la barre de navigation).
-
-Puisque notre backend Spring Boot et notre base de données PostgreSQL sont maintenant opérationnels et solides, nous n'avons plus besoin de simuler quoi que ce soit.
-
-Je veux que tu nettoies le projet Angular en suivant ces étapes précises :
-
-1. Suppression de l'interface de Simulation
-Dans le composant principal (app.ts ou la barre de navigation), supprime complètement le menu déroulant de simulation d'utilisateur.
-L'application doit maintenant forcer l'utilisateur à passer par la page de connexion (/auth/login) pour obtenir un vrai token JWT depuis le backend.
-2. Nettoyage des Services et Données Statiques (Mocks)
-Dans les services (harmy-api.service.ts, order.service.ts, auth.service.ts, etc.), supprime tous les tableaux de données codés en dur (ex: MOCK_ORDERS, listes d'utilisateurs statiques, catalogues statiques).
-Si des signaux (signal()) ou des variables stockaient ces données statiques au démarrage, vide-les par défaut.
-3. Connexion exclusive au Backend REST
-Remplace toutes les fonctions qui renvoyaient des données statiques par de véritables appels HTTP (this.http.get(...), this.http.post(...)) ciblant notre API Spring Boot (http://localhost:8080/api/v1).
-Assure-toi que les requêtes gèrent correctement l'asynchronisme avec RxJS (Observables) avant de mettre à jour les Signals de l'interface.
-Vérifie que le auth.interceptor.ts attache bien le Bearer token aux requêtes sortantes.
-4. Épuration du Design
-Le thème global actuel est bien, mais l'interface est "polluée" par les éléments de démo. Nettoie la vue pour revenir à quelque chose de plus strict, minimaliste et haut de gamme, comme exigé par le SRS.
-Objectif final : Le frontend ne doit afficher que les données qui proviennent réellement de la base de données PostgreSQL via le backend Spring Boot. Plus aucune fausse donnée ne doit apparaître à l'écran. Procède fichier par fichier et montre-moi le code.
+ endpoint: ${CLOUDFLARE_R2_ENDPOINT:https://c298de3d6c8cfa623f8a66bd2add5c36.r2.cloudflarestorage.com}
+    bucket: ${CLOUDFLARE_R2_BUCKET:harmyswing}
+    access-key: ${CLOUDFLARE_R2_ACCESS_KEY:1249f45c1b41d590d45ec67f0e9b52a4}
+    secret-key: ${CLOUDFLARE_R2_SECRET_KEY:b84716b6db57c710b383d50e87139c8882657cb9af31a2c514531c395057f42}
+    public-url: ${CLOUDFLARE_R2_PUBLIC_URL:https://pub-00e6de6a8f434bb58c97225f2b4bdd78.r2.dev}
