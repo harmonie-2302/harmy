@@ -1,0 +1,39 @@
+# =====================================================================
+# Harmy'Swing — Frontend Angular 21 en rendu serveur (SSR Node/Express)
+# Destination : /etc/systemd/system/harmy-frontend.service
+# =====================================================================
+[Unit]
+Description=Harmy'Swing — Frontend Angular SSR
+Documentation=https://github.com/harmonie-2302/harmy
+After=network-online.target harmy-backend.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=harmy
+Group=harmy
+
+# Le serveur SSR lit/écrit ./harmy_database.json relativement à son
+# répertoire de travail : il doit donc être exécuté depuis /opt/harmy.
+WorkingDirectory=/opt/harmy
+
+EnvironmentFile=/etc/harmy/frontend.env
+ExecStart=/usr/bin/node /opt/harmy/dist/app/server/server.mjs
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=harmy-frontend
+
+# Durcissement
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,45 @@
+# =====================================================================
+# Harmy'Swing — API REST Spring Boot (Java 17)
+# Destination : /etc/systemd/system/harmy-backend.service
+# =====================================================================
+[Unit]
+Description=Harmy'Swing — API REST Spring Boot
+Documentation=https://github.com/harmonie-2302/harmy
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=harmy
+Group=harmy
+WorkingDirectory=/opt/harmy
+
+# Identifiants base de données, JWT et Cloudflare R2 (hors dépôt Git).
+EnvironmentFile=/etc/harmy/backend.env
+
+# 2 Go de RAM au total sur le VPS : le tas JVM est plafonné pour laisser
+# vivre PostgreSQL, nginx et le rendu SSR Node.
+ExecStart=/usr/bin/java -Xms128m -Xmx512m -XX:+UseSerialGC -jar /opt/harmy/backend.jar
+
+Restart=always
+RestartSec=5
+# Spring Boot renvoie 143 (SIGTERM) lors d'un arrêt propre.
+SuccessExitStatus=143
+TimeoutStopSec=30
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=harmy-backend
+
+# Durcissement
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

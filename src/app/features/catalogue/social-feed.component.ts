@@ -5,6 +5,7 @@ import { HarmyApiService as HarmyApi, Post } from '@core/services/harmy-api.serv
 import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
+import { API_BASE_URL } from '@core/config/api.config';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -394,7 +395,7 @@ export class SocialFeedComponent implements OnInit {
         const result = await this.api.uploadFile(file);
         if (result && (result.fileUrl || result.fileKey)) {
           this.postForm.patchValue({
-            mediaUrl: result.fileUrl || `http://localhost:8080/api/v1/storage/${result.fileKey}`
+            mediaUrl: result.fileUrl || `${API_BASE_URL}/storage/${result.fileKey}`
           });
         }
       } catch (e) {
