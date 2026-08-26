@@ -87,9 +87,10 @@ install -o root -g root -m 600 /opt/harmy/deploy/backup.env.example /etc/harmy/b
 /opt/harmy/deploy/setup-rclone-backup.sh
 ```
 
-L'assistant affiche une URL Google à ouvrir sur un autre ordinateur. Après
-autorisation, rclone demande la confirmation OAuth dans le terminal SSH, puis
-enregistre uniquement le jeton renouvelable dans `/etc/harmy/rclone.conf`.
+Le VPS n'ayant pas de navigateur, exécutez d'abord `rclone authorize drive` sur
+votre ordinateur. Google ouvre alors la page d'autorisation locale et rclone
+affiche un token OAuth JSON. Collez ce token dans l'assistant SSH; il sera
+enregistré dans `/etc/harmy/rclone.conf` et renouvelé automatiquement.
 Le compte ne reçoit l'accès qu'au remote Drive configuré. Lancez ensuite :
 
 ```bash

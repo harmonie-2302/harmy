@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Configure rclone avec Google Drive sur le VPS.
-# Le flux est headless : le script affiche un lien Google, l'utilisateur
-# l'ouvre sur son ordinateur, autorise rclone, puis confirme le compte.
+# Le VPS n'a pas de navigateur : l'utilisateur lance `rclone authorize drive`
+# sur son ordinateur, puis colle le token OAuth JSON dans la session SSH.
 set -Eeuo pipefail
 umask 077
 
@@ -22,22 +22,28 @@ fi
 
 echo "=== Configuration Google Drive pour rclone ==="
 echo
-echo "Le navigateur n'est pas necessaire sur le VPS."
-echo "Une URL Google va s'afficher ci-dessous. Ouvrez-la sur votre ordinateur,"
-echo "connectez-vous au compte Google qui doit recevoir les sauvegardes,"
-echo "autorisez rclone, puis revenez ici."
+echo "Sur votre ordinateur, installez rclone si necessaire, puis executez :"
+echo "  rclone authorize drive"
+echo "Une page Google s'ouvrira. Autorisez le compte Drive voulu."
+echo "Copiez ensuite tout le token JSON affiche par rclone et collez-le ici."
 echo
 
 if [ -f "$RCLONE_CONFIG" ] && rclone listremotes --config "$RCLONE_CONFIG" | grep -qx "${REMOTE}:"; then
     echo "Le remote $REMOTE existe deja. Test de connexion..."
     rclone lsd "$REMOTE:" --config "$RCLONE_CONFIG" --max-depth 1
 else
-    # --auth-no-open-browser force l'affichage de l'URL exploitable en SSH.
-    # rclone demande ensuite le code/token OAuth fourni par Google.
+    # La version Ubuntu de rclone demande le token produit par `rclone
+    # authorize drive` sur une machine qui dispose d'un navigateur.
+    read -r -p "Collez le token OAuth JSON puis appuyez sur Entree : " OAUTH_TOKEN
+    if [ -z "$OAUTH_TOKEN" ]; then
+        echo "ERREUR: token OAuth vide." >&2
+        exit 1
+    fi
     rclone config create "$REMOTE" drive \
         --config "$RCLONE_CONFIG" \
-        --auth-no-open-browser \
-        --drive-scope drive.file
+        --config-is-local \
+        scope drive.file \
+        token "$OAUTH_TOKEN"
 fi
 
 echo
