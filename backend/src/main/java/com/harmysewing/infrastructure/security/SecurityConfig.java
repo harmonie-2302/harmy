@@ -61,6 +61,12 @@ public class SecurityConfig {
                                 "/posts", "/posts/**",
                                 "/ateliers", "/ateliers/*",
                                 "/ateliers/*/reviews").permitAll()
+                        // Lecture des images en libre accès : une balise <img> ne
+                        // transmet jamais l'en-tête Authorization, donc protéger
+                        // cette route rendrait toute image impossible à afficher.
+                        // Le téléversement (POST) et la suppression (DELETE)
+                        // restent soumis à authentification.
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/storage/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // Ajout du filtre JWT avant le filtre standard UsernamePasswordAuthenticationFilter

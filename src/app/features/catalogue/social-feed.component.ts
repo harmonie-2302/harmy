@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HarmyApiService as HarmyApi, Post } from '@core/services/harmy-api.service';
 import { AuthService } from '@core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
-import { API_BASE_URL } from '@core/config/api.config';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -216,7 +215,7 @@ import { API_BASE_URL } from '@core/config/api.config';
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-gold-500/40 shadow-2xl relative">
           
           <button 
-            (click)="openPostModal.set(false)"
+            (click)="closePostModal()"
             class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
             <span class="material-icons">close</span>
           </button>
@@ -258,13 +257,56 @@ import { API_BASE_URL } from '@core/config/api.config';
               <div class="space-y-2">
                 <input 
                   type="file" 
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
                   (change)="onFileSelected($event)"
                   class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-gold-50 file:text-gold-700 hover:file:bg-gold-100">
+
+                <!-- Prévisualisation immédiate : l'aperçu est généré localement
+                     (URL.createObjectURL) dès la sélection, sans attendre le
+                     serveur, puis l'état du téléversement est affiché dessus. -->
+                @if (previewUrl(); as preview) {
+                  <div class="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-[4/3]">
+                    <img [src]="preview" class="w-full h-full object-contain" alt="Aperçu de la création">
+
+                    @if (uploading()) {
+                      <div class="absolute inset-0 bg-noir-profond/60 backdrop-blur-sm flex flex-col items-center justify-center gap-2">
+                        <span class="material-icons text-gold-400 animate-spin text-2xl">progress_activity</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gold-300">Envoi en cours…</span>
+                      </div>
+                    } @else if (uploadError()) {
+                      <div class="absolute inset-0 bg-red-900/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 p-4 text-center">
+                        <span class="material-icons text-red-200 text-2xl">error_outline</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-red-100">Échec de l'envoi</span>
+                      </div>
+                    } @else if (uploadedUrl()) {
+                      <div class="absolute top-2 right-2 bg-emerald-600/95 px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-lg">
+                        <span class="material-icons text-white text-xs">check_circle</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-white">Image envoyée</span>
+                      </div>
+                    }
+
+                    <button
+                      type="button"
+                      (click)="clearSelectedImage()"
+                      title="Retirer l'image"
+                      class="absolute top-2 left-2 bg-noir-profond/80 hover:bg-noir-profond text-white w-7 h-7 rounded-lg flex items-center justify-center shadow-lg">
+                      <span class="material-icons text-sm">close</span>
+                    </button>
+                  </div>
+                }
+
+                @if (uploadError(); as erreur) {
+                  <p class="text-[11px] font-semibold text-red-600 flex items-start gap-1.5">
+                    <span class="material-icons text-sm mt-px">warning</span>
+                    <span>{{ erreur }}</span>
+                  </p>
+                }
+
                 <input 
                   type="text" 
                   formControlName="mediaUrl"
                   placeholder="Ou collez directement une URL d'image"
+                  (input)="onMediaUrlTyped()"
                   class="w-full px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
               </div>
             </div>
@@ -272,17 +314,24 @@ import { API_BASE_URL } from '@core/config/api.config';
             <div class="flex justify-end gap-3 pt-4">
               <button 
                 type="button" 
-                (click)="openPostModal.set(false)" 
+                (click)="closePostModal()"
                 class="px-4 py-2 text-xs font-bold text-gray-600 hover:text-gray-900">
                 Annuler
               </button>
               <button 
                 type="submit" 
-                [disabled]="postForm.invalid"
-                class="btn-gold px-5 py-2 text-xs font-bold shadow-md">
-                Publier la Création
+                [disabled]="postForm.invalid || uploading() || submitting()"
+                class="btn-gold px-5 py-2 text-xs font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ uploading() ? 'Envoi de l\\'image…' : submitting() ? 'Publication…' : 'Publier la Création' }}
               </button>
             </div>
+
+            @if (publishError(); as erreur) {
+              <p class="text-[11px] font-semibold text-red-600 flex items-start gap-1.5 justify-end">
+                <span class="material-icons text-sm mt-px">warning</span>
+                <span>{{ erreur }}</span>
+              </p>
+            }
           </form>
 
         </div>
@@ -290,7 +339,10 @@ import { API_BASE_URL } from '@core/config/api.config';
     }
   `
 })
-export class SocialFeedComponent implements OnInit {
+export class SocialFeedComponent implements OnInit, OnDestroy {
+  /** Visuel affiché lorsqu'une image de publication est illisible. */
+  private static readonly IMAGE_DE_REPLI = '/hero_couture_dress.jpg';
+
   api = inject(HarmyApi);
   authService = inject(AuthService);
   router = inject(Router);
@@ -300,6 +352,25 @@ export class SocialFeedComponent implements OnInit {
   selectedTag = signal<string>('all');
   openPostModal = signal(false);
   activeCommentPostId = signal<string | null>(null);
+
+  /** Aperçu affiché dans le formulaire : blob local, puis URL définitive. */
+  previewUrl = signal<string | null>(null);
+  uploading = signal(false);
+  uploadError = signal<string | null>(null);
+  uploadedUrl = signal<string | null>(null);
+  submitting = signal(false);
+  publishError = signal<string | null>(null);
+
+  /** Blob à révoquer pour ne pas fuir de mémoire entre deux sélections. */
+  private objectUrl: string | null = null;
+
+  /** Types acceptés côté client, alignés sur UploadImageUseCase. */
+  private static readonly TYPES_ACCEPTES = [
+    'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif'
+  ];
+
+  /** 15 Mo, identique à la limite du backend. */
+  private static readonly TAILLE_MAX_OCTETS = 15 * 1024 * 1024;
 
   tags = [
     { id: 'all', label: 'Toutes les créations', icon: '✦' },
@@ -312,7 +383,10 @@ export class SocialFeedComponent implements OnInit {
   postForm = this.fb.group({
     caption: ['', Validators.required],
     priceHint: [25000, [Validators.required, Validators.min(0)]],
-    mediaUrl: ['/hero_couture_dress.jpg', Validators.required],
+    // Volontairement vide : pré-remplir ce champ avec l'image de démonstration
+    // permettait de publier le visuel par défaut sans s'en apercevoir lorsque
+    // le téléversement échouait.
+    mediaUrl: ['', Validators.required],
     tagsInput: ['Wax, Robe']
   });
 
@@ -375,8 +449,12 @@ export class SocialFeedComponent implements OnInit {
 
   onImgError(event: Event) {
     const target = event.target as HTMLImageElement;
-    if (target && target.src !== '/hero_couture_dress.jpg') {
-      target.src = '/hero_couture_dress.jpg';
+    if (!target) return;
+    // target.src renvoie une URL absolue : comparer à un chemin relatif serait
+    // toujours faux et provoquerait une boucle si l'image de repli manquait.
+    if (!target.dataset['fallbackApplied']) {
+      target.dataset['fallbackApplied'] = 'true';
+      target.src = SocialFeedComponent.IMAGE_DE_REPLI;
     }
   }
 
@@ -394,44 +472,141 @@ export class SocialFeedComponent implements OnInit {
     }
   }
 
+  /**
+   * Prévisualisation immédiate puis téléversement.
+   *
+   * L'aperçu est produit localement par `URL.createObjectURL`, donc affiché
+   * instantanément sans attendre le serveur. Le téléversement se poursuit en
+   * arrière-plan et son résultat est rendu visible : tant qu'il n'a pas
+   * abouti, `mediaUrl` reste vide et le formulaire refuse la publication.
+   */
   async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      try {
-        const result = await this.api.uploadFile(file);
-        if (result && (result.fileUrl || result.fileKey)) {
-          this.postForm.patchValue({
-            mediaUrl: result.fileUrl || `${API_BASE_URL}/storage/${result.fileKey}`
-          });
-        }
-      } catch (e) {
-        console.error('Erreur lors du téléversement vers Cloudflare R2:', e);
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.uploadError.set(null);
+    this.uploadedUrl.set(null);
+    this.publishError.set(null);
+    this.postForm.patchValue({ mediaUrl: '' });
+
+    if (!SocialFeedComponent.TYPES_ACCEPTES.includes(file.type)) {
+      this.revokeObjectUrl();
+      this.previewUrl.set(null);
+      this.uploadError.set('Format non pris en charge. Choisissez une image JPEG, PNG, WebP, GIF ou AVIF.');
+      input.value = '';
+      return;
+    }
+
+    if (file.size > SocialFeedComponent.TAILLE_MAX_OCTETS) {
+      this.revokeObjectUrl();
+      this.previewUrl.set(null);
+      const tailleMo = (file.size / (1024 * 1024)).toFixed(1);
+      this.uploadError.set(`Image trop volumineuse (${tailleMo} Mo). La taille maximale est de 15 Mo.`);
+      input.value = '';
+      return;
+    }
+
+    // Aperçu instantané, avant tout appel réseau.
+    this.revokeObjectUrl();
+    this.objectUrl = URL.createObjectURL(file);
+    this.previewUrl.set(this.objectUrl);
+
+    this.uploading.set(true);
+    try {
+      const result = await this.api.uploadFile(file);
+      if (!result?.fileUrl) {
+        throw new Error("Le serveur n'a pas renvoyé d'URL pour l'image.");
       }
+      this.postForm.patchValue({ mediaUrl: result.fileUrl });
+      this.uploadedUrl.set(result.fileUrl);
+    } catch (e: unknown) {
+      this.uploadError.set(this.lireErreur(e, "Échec de l'envoi de l'image. Vérifiez votre connexion et réessayez."));
+      this.postForm.patchValue({ mediaUrl: '' });
+    } finally {
+      this.uploading.set(false);
     }
   }
 
+  /** Saisie manuelle d'une URL : elle sert alors d'aperçu. */
+  onMediaUrlTyped() {
+    const valeur = (this.postForm.value.mediaUrl || '').trim();
+    this.uploadError.set(null);
+    this.uploadedUrl.set(null);
+    this.revokeObjectUrl();
+    this.previewUrl.set(valeur.length > 0 ? valeur : null);
+  }
+
+  clearSelectedImage() {
+    this.revokeObjectUrl();
+    this.previewUrl.set(null);
+    this.uploadedUrl.set(null);
+    this.uploadError.set(null);
+    this.postForm.patchValue({ mediaUrl: '' });
+  }
+
+  closePostModal() {
+    this.openPostModal.set(false);
+    this.reinitialiserFormulaire();
+  }
+
+  private revokeObjectUrl() {
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = null;
+    }
+  }
+
+  private reinitialiserFormulaire() {
+    this.revokeObjectUrl();
+    this.previewUrl.set(null);
+    this.uploadedUrl.set(null);
+    this.uploadError.set(null);
+    this.publishError.set(null);
+    this.postForm.reset({ caption: '', priceHint: 25000, mediaUrl: '', tagsInput: 'Wax, Robe' });
+  }
+
+  private lireErreur(e: unknown, parDefaut: string): string {
+    const erreur = e as { error?: { message?: string }; message?: string; status?: number };
+    if (erreur?.status === 401) {
+      return 'Session expirée. Reconnectez-vous avant de publier.';
+    }
+    if (erreur?.status === 413) {
+      return 'Image trop volumineuse. La taille maximale est de 15 Mo.';
+    }
+    return erreur?.error?.message || erreur?.message || parDefaut;
+  }
+
   async submitPost() {
-    if (this.postForm.invalid) return;
+    if (this.postForm.invalid || this.uploading() || this.submitting()) return;
+
     const { caption, priceHint, mediaUrl, tagsInput } = this.postForm.value;
+    const image = (mediaUrl || '').trim();
+    if (!image) {
+      this.uploadError.set("Ajoutez une image avant de publier votre création.");
+      return;
+    }
 
     const tags = (tagsInput || '')
       .split(',')
       .map(t => t.trim())
       .filter(t => t.length > 0);
 
+    this.submitting.set(true);
+    this.publishError.set(null);
     try {
-      await this.api.createPost(
-        caption || '',
-        priceHint || 0,
-        tags,
-        [mediaUrl || '']
-      );
+      await this.api.createPost(caption || '', priceHint || 0, tags, [image]);
       this.openPostModal.set(false);
-      this.postForm.reset({ priceHint: 25000, mediaUrl: '/hero_couture_dress.jpg', tagsInput: 'Wax, Robe' });
+      this.reinitialiserFormulaire();
       await this.loadPosts();
-    } catch (e) {
-      console.error(e);
+    } catch (e: unknown) {
+      this.publishError.set(this.lireErreur(e, 'La publication a échoué. Réessayez.'));
+    } finally {
+      this.submitting.set(false);
     }
+  }
+
+  ngOnDestroy() {
+    this.revokeObjectUrl();
   }
 }

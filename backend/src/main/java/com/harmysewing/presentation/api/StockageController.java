@@ -45,6 +45,15 @@ public class StockageController {
         }
     }
 
+    /**
+     * Lecture de secours d'une image, en accès public.
+     *
+     * <p>En production, nginx sert d'abord le fichier depuis le disque
+     * ({@code /uploads/<clé>}). Cette route n'est sollicitée que lorsque le
+     * fichier est absent du disque : l'orchestrateur de stockage le récupère
+     * alors sur Cloudflare R2, ce qui rend la panne d'un backend invisible pour
+     * le visiteur.</p>
+     */
     @GetMapping("/{fileKey}")
     public ResponseEntity<byte[]> telechargerFichier(@PathVariable String fileKey) {
         byte[] fileBytes = fileStoragePort.downloadFile(fileKey);
@@ -56,12 +65,16 @@ public class StockageController {
             mediaType = MediaType.parseMediaType("image/webp");
         } else if (lowerKey.endsWith(".gif")) {
             mediaType = MediaType.IMAGE_GIF;
+        } else if (lowerKey.endsWith(".avif")) {
+            mediaType = MediaType.parseMediaType("image/avif");
         } else if (lowerKey.endsWith(".svg")) {
             mediaType = MediaType.parseMediaType("image/svg+xml");
         }
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileKey + "\"")
+                // La clé est un UUID immuable : le contenu ne changera jamais.
+                .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
                 .contentType(mediaType)
                 .body(fileBytes);
     }

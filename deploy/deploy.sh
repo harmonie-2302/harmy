@@ -53,7 +53,24 @@ systemctl restart harmy-frontend
 sleep 18
 
 echo
-echo "### 5/6 — Vérification"
+echo "### 5/6 — Installation de la sauvegarde automatique"
+install -d -o root -g root -m 750 /etc/harmy
+install -d -o root -g root -m 700 /var/backups/harmy
+if [ ! -f /etc/harmy/backup.env ]; then
+    install -o root -g root -m 600 "$APP_DIR/deploy/backup.env.example" /etc/harmy/backup.env
+    echo "⚠️ /etc/harmy/backup.env créé avec des valeurs d'exemple : configurez rclone."
+fi
+chown root:root "$APP_DIR/deploy/backup.sh" "$APP_DIR/deploy/restore.sh" "$APP_DIR/deploy/setup-rclone-backup.sh"
+chmod 700 "$APP_DIR/deploy/backup.sh" "$APP_DIR/deploy/restore.sh"
+chmod 755 "$APP_DIR/deploy/setup-rclone-backup.sh"
+install -o root -g root -m 644 "$APP_DIR/deploy/systemd/harmy-backup.service" /etc/systemd/system/harmy-backup.service
+install -o root -g root -m 644 "$APP_DIR/deploy/systemd/harmy-backup.timer" /etc/systemd/system/harmy-backup.timer
+systemctl daemon-reload
+systemctl enable --now harmy-backup.timer
+systemctl is-active harmy-backup.timer
+
+echo
+echo "### 6/6 — Vérification"
 systemctl is-active harmy-backend harmy-frontend
 curl -sS -o /dev/null -w 'API  /api/v1/posts -> %{http_code}\n' http://127.0.0.1:8080/api/v1/posts
 curl -sS -o /dev/null -w 'SSR  /             -> %{http_code}\n' http://127.0.0.1:4000/

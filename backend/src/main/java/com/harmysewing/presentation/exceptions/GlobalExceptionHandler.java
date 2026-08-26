@@ -86,6 +86,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(
+            org.springframework.web.multipart.MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        // Sans ce gestionnaire, un fichier trop lourd remonte en 500 avec un
+        // message technique illisible pour l'utilisatrice.
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                "Payload Too Large",
+                "Image trop volumineuse. La taille maximale autorisée est de 15 Mo.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(

@@ -1,0 +1,15 @@
+[Unit]
+Description=Harmy'Swing - sauvegarde automatique tous les 5 jours
+
+[Timer]
+# Le timer est relatif a la derniere execution, donc exactement tous les
+# 5 jours. Persistent=true execute la sauvegarde au redemarrage si le VPS
+# etait arrete au moment prevu.
+OnBootSec=15min
+OnUnitActiveSec=5d
+Persistent=true
+RandomizedDelaySec=20min
+Unit=harmy-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,32 @@
+[Unit]
+Description=Harmy'Swing - sauvegarde portable et synchronisation Google Drive
+Documentation=file:/opt/harmy/deploy/README.md
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/harmy
+ExecStart=/opt/harmy/deploy/backup.sh
+StateDirectory=harmy-backups
+StateDirectoryMode=0700
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+PrivateTmp=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+# runuser doit pouvoir changer d'identite vers postgres pour pg_dump/psql.
+# Les autres protections systemd restent actives.
+
+# La sauvegarde doit lire les secrets et la configuration, puis ecrire dans
+# /var/backups. Le reste du systeme reste en lecture seule.
+ProtectSystem=strict
+ReadWritePaths=/var/backups/harmy /var/lib/harmy-backups
+
+[Install]
+WantedBy=multi-user.target

@@ -30,4 +30,18 @@ public interface FileStoragePort {
      * @return L'URL publique
      */
     String getFileUrl(String fileKey);
+
+    /**
+     * Indique si ce backend est exploitable (configuration complète et valide).
+     * Un backend indisponible est ignoré par l'orchestrateur de stockage au
+     * lieu de faire échouer le démarrage de l'application.
+     */
+    default boolean estDisponible() {
+        return true;
+    }
+
+    /** Libellé court utilisé dans les journaux. */
+    default String nomTechnique() {
+        return getClass().getSimpleName();
+    }
 }
