@@ -160,7 +160,7 @@ import { HarmyApiService, User } from '@core/services/harmy-api.service';
                 </div>
               }
 
-              <div class="mt-6 flex items-center gap-3">
+              <div class="mt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3">
                 <button type="submit" [disabled]="saving()"
                         class="btn-gold px-6 py-3 text-[11px] font-bold disabled:opacity-50 flex items-center gap-1.5">
                   @if (saving()) {

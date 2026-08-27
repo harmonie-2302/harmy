@@ -2,6 +2,7 @@ package com.harmysewing.presentation.api;
 
 import com.harmysewing.application.ports.out.AtelierRepositoryPort;
 import com.harmysewing.application.ports.out.CommandeRepositoryPort;
+import com.harmysewing.application.ports.out.FileStoragePort;
 import com.harmysewing.application.ports.out.UserRepositoryPort;
 import com.harmysewing.application.services.AtelierProvisioningService;
 import com.harmysewing.domain.exceptions.DomainException;
@@ -44,6 +45,7 @@ public class HarmyFeaturesController {
     private final ReportSpringDataRepository reportRepository;
     private final CurrentUserProvider currentUserProvider;
     private final AtelierProvisioningService atelierProvisioningService;
+    private final FileStoragePort fileStoragePort;
 
     public HarmyFeaturesController(
             CommandeRepositoryPort commandeRepositoryPort,
@@ -55,7 +57,8 @@ public class HarmyFeaturesController {
             CommentSpringDataRepository commentRepository,
             ReportSpringDataRepository reportRepository,
             CurrentUserProvider currentUserProvider,
-            AtelierProvisioningService atelierProvisioningService) {
+            AtelierProvisioningService atelierProvisioningService,
+            FileStoragePort fileStoragePort) {
         this.commandeRepositoryPort = commandeRepositoryPort;
         this.userRepositoryPort = userRepositoryPort;
         this.atelierRepositoryPort = atelierRepositoryPort;
@@ -66,6 +69,7 @@ public class HarmyFeaturesController {
         this.reportRepository = reportRepository;
         this.currentUserProvider = currentUserProvider;
         this.atelierProvisioningService = atelierProvisioningService;
+        this.fileStoragePort = fileStoragePort;
     }
 
     // ------------------------------------------------------------------
@@ -157,16 +161,23 @@ public class HarmyFeaturesController {
         if (request.get("tags") != null) {
             post.setTags(String.join(",", listeDeTextes(request.get("tags"))));
         }
+        List<String> mediasASupprimer = List.of();
         if (request.get("media") != null) {
             List<String> media = listeDeTextes(request.get("media"));
             if (media.isEmpty()) {
                 throw new DomainException("Une publication doit conserver au moins une photo.");
             }
+            List<String> anciensMedias = new ArrayList<>(post.getMedia());
             post.getMedia().clear();
             post.getMedia().addAll(media);
+            mediasASupprimer = anciensMedias.stream()
+                    .filter(ancien -> !media.contains(ancien))
+                    .toList();
         }
 
-        return ResponseEntity.ok(toPostDto(postRepository.save(post)));
+        PostJpaEntity sauvegarde = postRepository.save(post);
+        mediasASupprimer.forEach(this::supprimerMediaInterne);
+        return ResponseEntity.ok(toPostDto(sauvegarde));
     }
 
     @DeleteMapping("/posts/{postId}")
@@ -177,8 +188,10 @@ public class HarmyFeaturesController {
                 .orElseThrow(() -> new DomainException("Publication introuvable."));
         exigerProprietaireDePublication(user, post);
 
+        List<String> mediasASupprimer = new ArrayList<>(post.getMedia());
         commentRepository.deleteAll(commentRepository.findByPostId(postId));
         postRepository.delete(post);
+        mediasASupprimer.forEach(this::supprimerMediaInterne);
         return ResponseEntity.noContent().build();
     }
 
@@ -721,6 +734,22 @@ public class HarmyFeaturesController {
         if (post.getAuthorId() == null || !post.getAuthorId().equals(user.getId())) {
             throw new DomainException("Vous ne pouvez modifier que vos propres publications.");
         }
+    }
+
+    /**
+     * Supprime uniquement les images gérées par Harmy (`/uploads/<clé>`).
+     * Une URL externe fournie manuellement ne doit jamais déclencher une
+     * suppression sur le stockage interne.
+     */
+    private void supprimerMediaInterne(String mediaUrl) {
+        if (mediaUrl == null || !mediaUrl.startsWith("/uploads/")) {
+            return;
+        }
+        String fileKey = mediaUrl.substring("/uploads/".length());
+        if (fileKey.isBlank() || fileKey.contains("/") || fileKey.contains("\\") || fileKey.contains("..")) {
+            return;
+        }
+        fileStoragePort.deleteFile(fileKey);
     }
 
     private String texte(Object valeur) {

@@ -122,7 +122,7 @@
   </header>
 
   <!-- ================= NAVIGATION MOBILE ================= -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-mahogany-100 flex items-center justify-around h-16 px-2 pb-1 custom-shadow-lg">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-mahogany-100 flex items-center justify-around h-[calc(4rem+env(safe-area-inset-bottom))] px-2 pb-[env(safe-area-inset-bottom)] custom-shadow-lg">
     <a routerLink="/" routerLinkActive="text-mahogany-500 font-bold" [routerLinkActiveOptions]="{ exact: true }"
        class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
       <span class="material-icons text-xl">home</span>
@@ -165,7 +165,7 @@
   </nav>
 
   <!-- ================= CONTENU ================= -->
-  <main class="flex-grow pb-24 md:pb-8">
+  <main class="flex-grow pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-8">
     <router-outlet></router-outlet>
   </main>
 </div>

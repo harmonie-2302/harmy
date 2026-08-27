@@ -68,8 +68,8 @@ import { CommonModule } from '@angular/common';
             
             <!-- Left 2 Cols: Form -->
             <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow">
-              <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-                <div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-100">
+                <div class="min-w-0">
                   <h2 class="serif-header text-xl font-bold text-gray-900">Mon Carnet de Mesures Privé</h2>
                   <p class="text-xs text-gray-500 font-light mt-0.5">Vos mensurations de haute couture (en Centimètres)</p>
                 </div>
@@ -132,31 +132,36 @@ import { CommonModule } from '@angular/common';
                 <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
                   @for (a of ateliers(); track a.id) {
                     <div class="p-3.5 rounded-2xl border border-gray-100 bg-pagne-subtle/30 space-y-2">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <h4 class="font-bold text-xs text-gray-900">{{ a.name }}</h4>
+                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="min-w-0">
+                          <h4 class="font-bold text-xs text-gray-900 break-words">{{ a.name }}</h4>
                           <p class="text-[10px] text-gray-500 font-light">{{ a.location.city }}, {{ a.location.country }}</p>
                         </div>
 
                         @if (isSharingWith(a)) {
                           <button 
                             (click)="toggleShareAccess(a, false)"
-                            class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-500/20 hover:bg-red-100 hover:text-red-700 hover:border-red-500/20 transition-all flex items-center gap-1">
+                            class="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-500/20 hover:bg-red-100 hover:text-red-700 hover:border-red-500/20 transition-all flex items-center justify-center gap-1">
                             <span class="material-icons text-xs">check_circle</span> Accès Autorisé
                           </button>
                         } @else {
                           <button 
                             (click)="toggleShareAccess(a, true)"
-                            class="btn-black px-3 py-1.5 text-[10px] font-bold">
+                            class="w-full sm:w-auto btn-black px-3 py-1.5 text-[10px] font-bold">
                             Partager Mesures
                           </button>
                         }
                       </div>
 
-                      <div class="flex justify-end pt-1 border-t border-gray-100">
+                      <div class="flex justify-end pt-1 border-t border-gray-100 gap-3">
+                        <button
+                          (click)="contactAtelier(a)"
+                          class="text-[10px] font-bold text-gold-700 hover:text-gold-800 flex items-center gap-1">
+                          <span class="material-icons text-xs text-gold-600">chat</span> Contacter
+                        </button>
                         <button 
                           (click)="openReviewForAtelier(a)"
-                          class="text-[10px] font-bold text-gold-700 hover:text-gold-800 flex items-center gap-1">
+                          class="text-[10px] font-bold text-gray-600 hover:text-gold-800 flex items-center gap-1">
                           <span class="material-icons text-xs text-gold-500">star</span> Laisser un avis
                         </button>
                       </div>
@@ -175,7 +180,7 @@ import { CommonModule } from '@angular/common';
         <!-- TAB CONTENT: TRACKING ORDERS -->
         @if (activeTab() === 'tracking') {
           <div class="bg-white rounded-3xl p-6 border border-gold-500/20 custom-shadow mb-8">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
                 <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Suivi de mes Confections en Temps Réel</h2>
                 <p class="text-xs text-gray-500 font-light">Statut d'avancement étape par étape de vos tenues sur mesure.</p>
@@ -208,7 +213,7 @@ import { CommonModule } from '@angular/common';
                       </div>
                     </div>
 
-                    <div class="grid grid-cols-4 text-center text-[10px] font-bold text-gray-500">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-2 text-center text-[10px] font-bold text-gray-500">
                       <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'TISSU_RECU')">1. Tissu Reçu</div>
                       <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'EN_COUTURE')">2. En Couture</div>
                       <div [class.text-gold-700]="isPastOrEqual(o.status || o.statut || '', 'PRET_POUR_ESSAYAGE')">3. Prêt Essayage</div>
@@ -237,8 +242,8 @@ import { CommonModule } from '@angular/common';
 
         <!-- MODAL 1: DEMANDE DE CONFECTION SUR MESURE -->
         @if (openOrderModal()) {
-          <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-gold-500/40 shadow-2xl relative">
+          <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+            <div class="bg-white rounded-3xl max-w-lg w-full max-h-[calc(100dvh-1.5rem)] overflow-y-auto p-5 sm:p-6 border border-gold-500/40 shadow-2xl relative">
               <button (click)="openOrderModal.set(false)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
                 <span class="material-icons text-xl">close</span>
               </button>
@@ -263,7 +268,7 @@ import { CommonModule } from '@angular/common';
                     <input type="text" formControlName="modelCaption" placeholder="Ex. Robe sirène en Pagne Wax avec broderies d'or" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
                   </div>
 
-                  <div class="grid grid-cols-2 gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Budget Total (FC)</label>
                       <input type="number" formControlName="total" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gold-500">
@@ -291,13 +296,13 @@ import { CommonModule } from '@angular/common';
 
         <!-- MODAL 2: AVIS & EVALUATION ATELIER -->
         @if (openReviewModal() && selectedAtelier()) {
-          <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-gold-500/40 shadow-2xl relative">
+          <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+            <div class="bg-white rounded-3xl max-w-md w-full max-h-[calc(100dvh-1.5rem)] overflow-y-auto p-5 sm:p-6 border border-gold-500/40 shadow-2xl relative">
               <button (click)="openReviewModal.set(false)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700">
                 <span class="material-icons text-xl">close</span>
               </button>
 
-              <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Évaluer {{ selectedAtelier()?.name }}</h2>
+              <h2 class="serif-header text-xl font-bold text-gray-900 mb-1 pr-10 break-words">Évaluer {{ selectedAtelier()?.name }}</h2>
               <p class="text-xs text-gray-500 font-light mb-6">Partagez votre expérience de couture avec la communauté Harmy'Swing.</p>
 
               <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
@@ -324,7 +329,7 @@ import { CommonModule } from '@angular/common';
                   </div>
                 </div>
 
-                <div class="flex justify-end gap-3">
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
                   <button type="button" (click)="openReviewModal.set(false)" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Annuler</button>
                   <button type="submit" class="btn-gold px-5 py-2 text-xs font-bold shadow-md">Publier l'Avis</button>
                 </div>
@@ -455,6 +460,20 @@ export class ClientSpaceComponent implements OnInit {
       this.orderForm.reset({ total: 150000, deposit: 50000 });
       this.loadAllData();
       alert("Votre demande de confection a été envoyée avec succès à la maison de couture !");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async contactAtelier(atelier: Atelier) {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+    try {
+      const ownerId = atelier.ownerId || atelier.couturiereId || '';
+      await this.api.startConversation(ownerId, atelier.id);
+      this.router.navigate(['/messagerie']);
     } catch (e) {
       console.error(e);
     }

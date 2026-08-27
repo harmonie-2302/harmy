@@ -75,6 +75,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Keep fixed mobile navigation from hiding the last form/card controls. */
+@supports (padding: max(0px)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 .serif-header {
   font-family: var(--font-serif);
 }
@@ -246,3 +253,45 @@ html {
 .delay-300 { transition-delay: 300ms; }
 .delay-400 { transition-delay: 400ms; }
 .delay-500 { transition-delay: 500ms; }
+
+/* Mobile responsiveness & overflow utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Screen size adaptations for text and containers */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+  .serif-header {
+    word-break: break-word;
+  }
+  /* Prevent table overflow on small mobile screens */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Long action labels must wrap instead of forcing horizontal overflow. */
+  button,
+  a {
+    max-width: 100%;
+  }
+
+  .pagne-card {
+    min-width: 0;
+  }
+
+  /* All application dialogs remain usable in landscape and small phones. */
+  .fixed.inset-0 > div {
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}

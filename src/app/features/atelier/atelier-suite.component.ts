@@ -42,16 +42,16 @@ import { CommonModule } from '@angular/common';
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-3">
+          <div class="w-full sm:w-auto flex flex-col xs:flex-row sm:flex-row gap-3">
             <button 
               (click)="openClientModal.set(true)"
-              class="px-4 py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition flex items-center gap-1.5">
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition flex items-center justify-center gap-1.5">
               <span class="material-icons text-sm">person_add</span>
               <span>Nouvelle Cliente</span>
             </button>
             <button 
               (click)="openOrderModal.set(true)"
-              class="btn-gold px-5 py-2.5 text-xs font-bold shadow-md flex items-center gap-1.5">
+              class="w-full sm:w-auto btn-gold px-5 py-2.5 text-xs font-bold shadow-md flex items-center justify-center gap-1.5">
               <span class="material-icons text-sm">add_shopping_cart</span>
               <span>Créer une Commande</span>
             </button>
@@ -106,22 +106,22 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="flex border-b border-gray-100 mb-6 gap-8">
+        <div class="flex overflow-x-auto no-scrollbar border-b border-gray-100 mb-6 gap-3 sm:gap-8 whitespace-nowrap pb-1">
           <button 
             (click)="activeTab.set('kanban')"
-            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2"
+            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2 shrink-0"
             [class]="activeTab() === 'kanban' ? 'border-gold-500 text-gold-700' : 'border-transparent text-gray-400 hover:text-gray-600'">
             <span class="material-icons text-sm">view_kanban</span> Suivi Kanban
           </button>
           <button 
             (click)="activeTab.set('clients')"
-            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2"
+            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2 shrink-0"
             [class]="activeTab() === 'clients' ? 'border-gold-500 text-gold-700' : 'border-transparent text-gray-400 hover:text-gray-600'">
             <span class="material-icons text-sm">group</span> Répertoire & Mesures Clientes
           </button>
           <button 
             (click)="activeTab.set('tasks')"
-            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2"
+            class="pb-3 text-xs font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2 shrink-0"
             [class]="activeTab() === 'tasks' ? 'border-gold-500 text-gold-700' : 'border-transparent text-gray-400 hover:text-gray-600'">
             <span class="material-icons text-sm">task_alt</span> Tâches Atelier
           </button>
@@ -224,7 +224,7 @@ import { CommonModule } from '@angular/common';
                   
                   <p class="text-xs text-gray-600 font-light mb-4 line-clamp-2">{{ c.notes || 'Aucune note particulière.' }}</p>
 
-                  <div class="grid grid-cols-4 gap-2 text-center text-[10px] pt-3 border-t border-gold-500/10">
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[10px] pt-3 border-t border-gold-500/10">
                     <div class="bg-white p-2 rounded-lg">
                       <span class="block text-gray-400 uppercase">Poitrine</span>
                       <strong class="text-gray-800">{{ c.measurements.bust }} cm</strong>
@@ -258,34 +258,34 @@ import { CommonModule } from '@angular/common';
           <div class="bg-white rounded-2xl border border-gray-100 p-6 max-w-3xl">
             <h2 class="serif-header text-lg font-bold text-gray-900 mb-6">Tâches de Couture à Accomplir</h2>
 
-            <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="flex gap-3 mb-6">
+            <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="flex flex-col sm:flex-row gap-3 mb-6">
               <input 
                 type="text" 
                 formControlName="title" 
                 placeholder="Ex. Acheter du fil doré, Repasser la doublure..." 
-                class="flex-grow px-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
+                class="flex-grow min-w-0 px-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
               <button 
                 type="submit" 
                 [disabled]="taskForm.invalid"
-                class="btn-gold px-5 py-2 text-xs font-bold shadow-sm disabled:opacity-50">
+                class="btn-gold px-5 py-2 text-xs font-bold shadow-sm disabled:opacity-50 sm:shrink-0">
                 Ajouter
               </button>
             </form>
 
             <div class="space-y-2">
               @for (t of tasks(); track t.id) {
-                <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between">
-                  <div class="flex items-center gap-3">
+                <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-3 min-w-0">
                     <input 
                       type="checkbox" 
                       [checked]="t.completed" 
                       (change)="toggleTask(t.id)"
                       class="rounded text-gold-600 focus:ring-gold-500">
-                    <span [class]="t.completed ? 'line-through text-gray-400 text-xs' : 'text-xs text-gray-800 font-medium'">
+                    <span [class]="t.completed ? 'line-through text-gray-400 text-xs break-words' : 'text-xs text-gray-800 font-medium break-words'">
                       {{ t.title }}
                     </span>
                   </div>
-                  <button (click)="deleteTask(t.id)" class="text-gray-400 hover:text-red-500">
+                  <button (click)="deleteTask(t.id)" class="text-gray-400 hover:text-red-500 shrink-0">
                     <span class="material-icons text-sm">delete</span>
                   </button>
                 </div>
@@ -334,7 +334,7 @@ import { CommonModule } from '@angular/common';
               <label class="block text-[10px] font-bold text-gray-700 uppercase mb-1">Date de Livraison Prévue</label>
               <input type="date" formControlName="dueDate" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl">
             </div>
-            <div class="flex justify-end gap-2 pt-4">
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
               <button type="button" (click)="openOrderModal.set(false)" class="px-4 py-2 text-xs font-bold text-gray-500">Annuler</button>
               <button type="submit" [disabled]="orderForm.invalid" class="btn-gold px-5 py-2 text-xs font-bold shadow-sm">Créer la commande</button>
             </div>
@@ -379,7 +379,7 @@ import { CommonModule } from '@angular/common';
                 <input type="number" formControlName="arm" class="w-full px-2 py-1.5 text-xs bg-gray-50 border rounded-lg">
               </div>
             </div>
-            <div class="flex justify-end gap-2 pt-4">
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
               <button type="button" (click)="openClientModal.set(false); isEditingClient.set(null)" class="px-4 py-2 text-xs font-bold text-gray-500">Annuler</button>
               <button type="submit" [disabled]="clientForm.invalid" class="btn-gold px-5 py-2 text-xs font-bold shadow-sm">Enregistrer</button>
             </div>
@@ -391,9 +391,9 @@ import { CommonModule } from '@angular/common';
     <!-- ORDER CARD REUSABLE TEMPLATE -->
     <ng-template #orderCard let-o>
       <div class="pagne-card bg-white p-4 rounded-xl border border-gold-500/20 shadow-sm space-y-2">
-        <div class="flex justify-between items-start">
-          <h4 class="font-bold text-xs text-gray-900">{{ o.customerName || 'Cliente' }}</h4>
-          <span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-gold-50 text-gold-800 border border-gold-500/30">
+         <div class="flex flex-wrap justify-between items-start gap-2">
+          <h4 class="font-bold text-xs text-gray-900 min-w-0 break-words">{{ o.customerName || 'Cliente' }}</h4>
+          <span class="max-w-full break-all text-[9px] px-2 py-0.5 rounded-full font-bold bg-gold-50 text-gold-800 border border-gold-500/30">
             {{ o.status || o.statut }}
           </span>
         </div>

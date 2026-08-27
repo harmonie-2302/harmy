@@ -15,20 +15,20 @@ export interface KanbanColumn {
   standalone: true,
   imports: [CommonModule, DragDropModule],
   template: `
-    <div class="p-6 bg-gray-900 min-h-screen text-gray-100">
+    <div class="p-4 sm:p-6 bg-gray-900 min-h-screen text-gray-100">
       
       <!-- Top Title Bar -->
-      <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800">
-        <div>
-          <h1 class="text-3xl font-extrabold text-amber-500 tracking-wide flex items-center gap-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-800">
+        <div class="min-w-0">
+          <h1 class="text-xl sm:text-3xl font-extrabold text-amber-500 tracking-wide flex items-start gap-2 sm:gap-3 break-words">
             <span>✂️</span> Harmy'Swing — Kanban Atelier Couture
           </h1>
-          <p class="text-sm text-gray-400 mt-1">Gestion réactive des confections via Angular Signals & Spring Boot</p>
+          <p class="text-xs sm:text-sm text-gray-400 mt-1">Gestion réactive des confections via Angular Signals & Spring Boot</p>
         </div>
 
         <button 
           (click)="refresh()"
-          class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold rounded-xl shadow-lg transition flex items-center gap-2">
+          class="w-full sm:w-auto px-4 py-2 bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 shrink-0">
           <span class="material-icons text-sm">refresh</span> Actualiser
         </button>
       </div>
@@ -77,11 +77,11 @@ export interface KanbanColumn {
                   cdkDrag
                   class="bg-gray-700 hover:bg-gray-650 border border-gray-600 rounded-xl p-4 shadow-md cursor-grab active:cursor-grabbing transition transform hover:-translate-y-0.5">
                   
-                  <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
+                  <div class="flex flex-wrap justify-between items-start gap-1 mb-2">
+                    <span class="max-w-full break-all text-xs font-mono font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
                       {{ order.reference }}
                     </span>
-                    <span class="text-xs text-gray-400 font-medium">
+                    <span class="text-xs text-gray-400 font-medium break-words">
                       Livraison: {{ order.dateLivraisonPrevue || 'N/A' }}
                     </span>
                   </div>
@@ -90,7 +90,7 @@ export interface KanbanColumn {
                     {{ order.description || 'Confection sur mesure' }}
                   </p>
 
-                  <div class="flex justify-between items-center text-xs pt-2 border-t border-gray-650">
+                  <div class="flex flex-wrap justify-between items-center gap-1 text-xs pt-2 border-t border-gray-650">
                     <span class="text-gray-400">Total: <strong class="text-white">{{ order.prixTotal | number }} FC</strong></span>
                     <span [class]="order.soldeRestant > 0 ? 'text-red-400 font-bold' : 'text-emerald-400 font-bold'">
                       {{ order.soldeRestant > 0 ? 'Reste: ' + (order.soldeRestant | number) + ' FC' : 'Payé' }}

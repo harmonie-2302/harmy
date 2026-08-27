@@ -32,17 +32,17 @@ import { CommonModule } from '@angular/common';
       } @else {
 
         <!-- Message Center Frame -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 min-h-[70vh] bg-white rounded-3xl overflow-hidden border border-gold-500/20 custom-shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-3 min-h-[70vh] bg-white rounded-3xl overflow-hidden border border-gold-500/20 custom-shadow-lg">
           
           <!-- Inbox Sidebar List -->
-          <div class="p-6 border-r border-gray-100 flex flex-col justify-between">
+          <div [class]="selectedConv() ? 'hidden md:flex p-6 border-r border-gray-100 flex-col justify-between' : 'flex p-6 border-r border-gray-100 flex-col justify-between'">
             <div>
               <h2 class="serif-header text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
                 <span class="material-icons text-gold-600 text-sm">forum</span> Conversations
               </h2>
               <p class="text-[10px] text-gray-400 font-light mb-6">Vos échanges de couture d'exception</p>
               
-              <div class="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+              <div class="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
                 @for (conv of conversations(); track conv.id) {
                   <button 
                     (click)="selectConversation(conv)"
@@ -51,15 +51,15 @@ import { CommonModule } from '@angular/common';
                       ? 'border-gold-500 bg-gold-50/45 custom-shadow' 
                       : 'border-gray-100 bg-gray-50/50 hover:bg-gold-50/20 hover:border-gold-300'">
                     
-                    <div class="w-10 h-10 rounded-full bg-gold-100 text-gold-800 font-bold flex items-center justify-center text-xs">
+                    <div class="w-10 h-10 rounded-full bg-gold-100 text-gold-800 font-bold flex items-center justify-center text-xs shrink-0">
                       {{ (getPartnerDetail(conv).name || 'C')[0] }}
                     </div>
-                    <div class="flex-grow">
+                    <div class="flex-grow min-w-0">
                       <div class="flex justify-between items-start">
-                        <h4 class="text-xs font-bold text-gray-800 line-clamp-1 leading-tight">{{ getPartnerDetail(conv).name }}</h4>
-                        <span class="text-[8px] text-gray-400 font-mono">{{ conv.lastMessageAt | date:'shortTime' }}</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate leading-tight">{{ getPartnerDetail(conv).name }}</h4>
+                        <span class="text-[8px] text-gray-400 font-mono shrink-0 ml-2">{{ conv.lastMessageAt | date:'shortTime' }}</span>
                       </div>
-                      <p class="text-[10px] text-gray-500 font-light line-clamp-1 mt-0.5">{{ conv.lastMessagePreview }}</p>
+                      <p class="text-[10px] text-gray-500 font-light truncate mt-0.5">{{ conv.lastMessagePreview }}</p>
                     </div>
                   </button>
                 }
@@ -72,12 +72,12 @@ import { CommonModule } from '@angular/common';
             <!-- Current User Badge -->
             <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-noir-profond text-gold-400 font-bold flex items-center justify-center text-xs">
+                <div class="w-8 h-8 rounded-full bg-noir-profond text-gold-400 font-bold flex items-center justify-center text-xs shrink-0">
                   {{ (authService.currentUser()?.nom || 'U')[0] }}
                 </div>
-                <div>
-                  <h4 class="text-xs font-bold text-gray-800">{{ authService.currentUser()?.nom || authService.currentUser()?.email }}</h4>
-                  <span class="text-[9px] font-extrabold text-gold-600 uppercase tracking-wider">
+                <div class="min-w-0">
+                  <h4 class="text-xs font-bold text-gray-800 truncate">{{ authService.currentUser()?.nom || authService.currentUser()?.email }}</h4>
+                  <span class="text-[9px] font-extrabold text-gold-600 uppercase tracking-wider block">
                     {{ authService.currentUser()?.role }}
                   </span>
                 </div>
@@ -86,28 +86,31 @@ import { CommonModule } from '@angular/common';
           </div>
 
           <!-- Chat Thread View -->
-          <div class="md:col-span-2 flex flex-col justify-between bg-pagne-subtle/30">
+          <div [class]="selectedConv() ? 'md:col-span-2 flex flex-col justify-between bg-pagne-subtle/30 min-h-[60vh]' : 'hidden md:flex md:col-span-2 flex-col justify-between bg-pagne-subtle/30'">
             @if (selectedConv(); as conv) {
               
               <!-- Chat Header -->
               <div class="p-4 bg-white border-b border-gray-100 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-gold-100 text-gold-800 font-bold flex items-center justify-center text-xs">
+                  <div class="flex items-center gap-3 min-w-0">
+                  <button (click)="selectedConv.set(null)" class="md:hidden p-1 rounded-lg text-gray-600 hover:bg-gray-100 flex items-center justify-center">
+                    <span class="material-icons text-xl">arrow_back</span>
+                  </button>
+                  <div class="w-9 h-9 rounded-full bg-gold-100 text-gold-800 font-bold flex items-center justify-center text-xs shrink-0">
                     {{ (getPartnerDetail(conv).name || 'C')[0] }}
                   </div>
-                  <div>
-                    <h3 class="text-xs font-bold text-gray-900">{{ getPartnerDetail(conv).name }}</h3>
+                  <div class="min-w-0">
+                    <h3 class="text-xs font-bold text-gray-900 truncate">{{ getPartnerDetail(conv).name }}</h3>
                     <p class="text-[9px] text-gray-400 font-light">Canal sécurisé</p>
                   </div>
                 </div>
               </div>
 
               <!-- Message History Scroll -->
-              <div id="chat-messages-container" class="p-6 overflow-y-auto space-y-4 flex-grow max-h-[55vh]">
+              <div id="chat-messages-container" class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-grow max-h-[55vh]">
                 @for (msg of messages(); track msg.id) {
                   <div [class]="isMe(msg.from) ? 'flex justify-end' : 'flex justify-start'">
                     <div 
-                      class="max-w-[75%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm font-light"
+                      class="max-w-[85%] sm:max-w-[75%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm font-light break-words"
                       [class]="isMe(msg.from) 
                         ? 'bg-gold-600 text-white rounded-br-none font-normal' 
                         : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'">
@@ -124,27 +127,27 @@ import { CommonModule } from '@angular/common';
               </div>
 
               <!-- Input Bar -->
-              <form [formGroup]="messageForm" (ngSubmit)="sendMsg()" class="p-4 bg-white border-t border-gray-100 flex gap-2">
+              <form [formGroup]="messageForm" (ngSubmit)="sendMsg()" class="p-3 sm:p-4 bg-white border-t border-gray-100 flex gap-2">
                 <input 
                   type="text" 
                   formControlName="text"
                   placeholder="Écrivez votre message..." 
-                  class="flex-grow px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500 font-light">
+                  class="flex-grow px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500 font-light min-w-0">
                 <button 
                   type="submit" 
                   [disabled]="messageForm.invalid"
-                  class="btn-gold px-5 py-2.5 text-xs font-bold shadow-sm disabled:opacity-50 flex items-center gap-1">
-                  <span class="material-icons text-sm">send</span> Envoyer
+                  class="btn-gold px-4 sm:px-5 py-2.5 text-xs font-bold shadow-sm disabled:opacity-50 flex items-center gap-1 shrink-0">
+                  <span class="material-icons text-sm">send</span> <span class="hidden sm:inline">Envoyer</span>
                 </button>
               </form>
 
             } @else {
               <!-- Empty State -->
-              <div class="h-full flex flex-col items-center justify-center p-8 text-center">
+              <div class="h-full flex flex-col items-center justify-center p-8 text-center min-h-[40vh]">
                 <span class="material-icons text-5xl text-gold-300 mb-3">forum</span>
                 <h3 class="serif-header text-lg font-bold text-gray-700">Sélectionnez une discussion</h3>
                 <p class="text-xs text-gray-400 max-w-sm mt-1">
-                  Choisissez une conversation dans la liste de gauche.
+                  Choisissez une conversation dans la liste.
                 </p>
               </div>
             }

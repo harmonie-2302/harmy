@@ -22,7 +22,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center p-6 sm:p-10 lg:p-12 relative z-10">
           
           <!-- Image Left Column -->
-          <div class="md:col-span-5 xl:col-span-4 relative group">
+          <div class="md:col-span-5 xl:col-span-4 relative group min-w-0">
             <div class="relative rounded-2xl overflow-hidden border-2 border-gold-500/40 aspect-[3/4] shadow-2xl">
               <img 
                 src="/hero_couture_dress.jpg" 
@@ -36,7 +36,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
           </div>
 
           <!-- Text Right Column -->
-          <div class="md:col-span-7 xl:col-span-8 flex flex-col justify-center">
+          <div class="md:col-span-7 xl:col-span-8 flex flex-col justify-center min-w-0">
             <span class="inline-block self-start px-3.5 py-1 rounded-full bg-emerald-950/80 text-gold-300 text-xs font-semibold uppercase tracking-widest mb-4 border border-gold-500/30">
               Savoir-Faire & Élégance Africaine
             </span>
@@ -48,8 +48,8 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             </p>
             <div class="flex flex-wrap gap-3.5">
               @if (authService.currentUser()?.role === 'COUTURIERE') {
-                <button 
-                  (click)="openPostModal.set(true)"
+                  <button
+                    (click)="openCreateModal()"
                   class="btn-gold px-5 py-3 text-sm font-bold flex items-center gap-2 shadow-lg">
                   <span class="material-icons text-sm">add_circle</span> Publier un Nouveau Modèle
                 </button>
@@ -84,26 +84,52 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
       </div>
 
       <!-- Main Feed Posts Grid -->
+      @if (actionError(); as erreur) {
+        <div class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-start gap-2">
+          <span class="material-icons text-base">warning</span>
+          <span>{{ erreur }}</span>
+        </div>
+      }
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
         @for (p of posts(); track p.id) {
           <div appScrollFade class="pagne-card bg-white rounded-3xl overflow-hidden border border-gold-500/20 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
             
             <!-- Post Header Author Info -->
             <div class="p-4 flex items-center justify-between border-b border-gray-100">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gold-100 text-gold-800 font-bold flex items-center justify-center text-xs">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-10 h-10 rounded-full bg-gold-100 text-gold-800 font-bold flex items-center justify-center text-xs shrink-0">
                   {{ (p.authorName || 'A')[0] }}
                 </div>
-                <div>
-                  <h3 class="text-xs font-bold text-gray-900 leading-tight">{{ p.authorName }}</h3>
+                <div class="min-w-0">
+                  <h3 class="text-xs font-bold text-gray-900 leading-tight truncate">{{ p.authorName }}</h3>
                   <span class="text-[10px] text-gold-600 font-semibold">Maison de Couture</span>
                 </div>
               </div>
-              <button 
-                (click)="contactCouturiere(p)"
-                class="px-3 py-1.5 bg-gold-50 text-gold-700 hover:bg-gold-500 hover:text-noir-profond border border-gold-500/30 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1">
-                <span class="material-icons text-xs">chat</span> Échanger
-              </button>
+              <div class="flex items-center gap-1.5">
+                @if (isPostOwner(p)) {
+                  <button
+                    type="button"
+                    (click)="openEditModal(p)"
+                    title="Modifier cette publication"
+                    class="w-8 h-8 bg-gray-50 text-gray-600 hover:bg-gold-100 hover:text-gold-800 border border-gray-200 rounded-xl flex items-center justify-center transition-colors">
+                    <span class="material-icons text-sm">edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deletePost(p)"
+                    title="Supprimer cette publication"
+                    class="w-8 h-8 bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-700 border border-gray-200 rounded-xl flex items-center justify-center transition-colors">
+                    <span class="material-icons text-sm">delete_outline</span>
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="contactCouturiere(p)"
+                    class="px-3 py-1.5 bg-gold-50 text-gold-700 hover:bg-gold-500 hover:text-noir-profond border border-gold-500/30 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1">
+                    <span class="material-icons text-xs">chat</span> Échanger
+                  </button>
+                }
+              </div>
             </div>
 
             <!-- Media Carousel / Image -->
@@ -180,7 +206,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
                         type="text" 
                         #commentInput
                         placeholder="Écrire un commentaire..." 
-                        class="flex-1 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-gold-500"
+                        class="flex-1 min-w-0 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-gold-500"
                         (keyup.enter)="submitComment(p, commentInput.value); commentInput.value = ''">
                       <button 
                         (click)="submitComment(p, commentInput.value); commentInput.value = ''"
@@ -211,8 +237,8 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
 
     <!-- Create Post Modal for Seamstresses -->
     @if (openPostModal()) {
-      <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-gold-500/40 shadow-2xl relative">
+      <div class="fixed inset-0 bg-noir-profond/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[calc(100dvh-1.5rem)] overflow-y-auto p-5 sm:p-8 border border-gold-500/40 shadow-2xl relative">
           
           <button 
             (click)="closePostModal()"
@@ -220,8 +246,12 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             <span class="material-icons">close</span>
           </button>
 
-          <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">Publier une Création Haute Couture</h2>
-          <p class="text-xs text-gray-500 mb-6">Mettez en valeur le savoir-faire de votre atelier dans le catalogue Harmy'Swing.</p>
+          <h2 class="serif-header text-xl font-bold text-gray-900 mb-1">
+            {{ editingPost() ? 'Modifier la Création' : 'Publier une Création Haute Couture' }}
+          </h2>
+          <p class="text-xs text-gray-500 mb-6">
+            {{ editingPost() ? 'Actualisez les informations visibles dans le catalogue.' : 'Mettez en valeur le savoir-faire de votre atelier dans le catalogue Harmy\'Swing.' }}
+          </p>
 
           <form [formGroup]="postForm" (ngSubmit)="submitPost()" class="space-y-4">
             <div>
@@ -233,7 +263,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
                 class="w-full px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500"></textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Prix Estimé (FC)</label>
                 <input 
@@ -311,7 +341,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               </div>
             </div>
 
-            <div class="flex justify-end gap-3 pt-4">
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
               <button 
                 type="button" 
                 (click)="closePostModal()"
@@ -322,7 +352,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
                 type="submit" 
                 [disabled]="postForm.invalid || uploading() || submitting()"
                 class="btn-gold px-5 py-2 text-xs font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
-                {{ uploading() ? 'Envoi de l\\'image…' : submitting() ? 'Publication…' : 'Publier la Création' }}
+                {{ uploading() ? 'Envoi de l\\'image…' : submitting() ? 'Enregistrement…' : editingPost() ? 'Enregistrer les modifications' : 'Publier la Création' }}
               </button>
             </div>
 
@@ -352,6 +382,7 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
   selectedTag = signal<string>('all');
   openPostModal = signal(false);
   activeCommentPostId = signal<string | null>(null);
+  editingPost = signal<Post | null>(null);
 
   /** Aperçu affiché dans le formulaire : blob local, puis URL définitive. */
   previewUrl = signal<string | null>(null);
@@ -360,6 +391,7 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
   uploadedUrl = signal<string | null>(null);
   submitting = signal(false);
   publishError = signal<string | null>(null);
+  actionError = signal<string | null>(null);
 
   /** Blob à révoquer pour ne pas fuir de mémoire entre deux sélections. */
   private objectUrl: string | null = null;
@@ -389,6 +421,33 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
     mediaUrl: ['', Validators.required],
     tagsInput: ['Wax, Robe']
   });
+
+  openCreateModal() {
+    this.editingPost.set(null);
+    this.reinitialiserFormulaire();
+    this.openPostModal.set(true);
+  }
+
+  openEditModal(post: Post) {
+    if (!this.isPostOwner(post)) return;
+    this.editingPost.set(post);
+    this.uploadError.set(null);
+    this.publishError.set(null);
+    this.uploadedUrl.set(post.media?.[0] || null);
+    this.previewUrl.set(post.media?.[0] || null);
+    this.postForm.reset({
+      caption: post.caption || '',
+      priceHint: post.priceHint || 0,
+      mediaUrl: post.media?.[0] || '',
+      tagsInput: (post.tags || []).join(', ')
+    });
+    this.openPostModal.set(true);
+  }
+
+  isPostOwner(post: Post): boolean {
+    const user = this.authService.currentUser();
+    return !!user && (user.role === 'ADMIN' || user.id === post.authorId);
+  }
 
   ngOnInit() {
     this.loadPosts();
@@ -559,6 +618,7 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
 
   private reinitialiserFormulaire() {
     this.revokeObjectUrl();
+    this.editingPost.set(null);
     this.previewUrl.set(null);
     this.uploadedUrl.set(null);
     this.uploadError.set(null);
@@ -595,12 +655,40 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
     this.submitting.set(true);
     this.publishError.set(null);
     try {
-      await this.api.createPost(caption || '', priceHint || 0, tags, [image]);
+      if (this.editingPost()) {
+        await this.api.updatePost(this.editingPost()!.id, {
+          caption: caption || '',
+          priceHint: priceHint || 0,
+          tags,
+          media: [image]
+        });
+      } else {
+        await this.api.createPost(caption || '', priceHint || 0, tags, [image]);
+      }
       this.openPostModal.set(false);
       this.reinitialiserFormulaire();
       await this.loadPosts();
     } catch (e: unknown) {
       this.publishError.set(this.lireErreur(e, 'La publication a échoué. Réessayez.'));
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
+  async deletePost(post: Post) {
+    if (!this.isPostOwner(post) || this.submitting()) return;
+    const confirmation = window.confirm(
+      `Supprimer définitivement « ${post.caption || 'cette publication'} » ?`
+    );
+    if (!confirmation) return;
+
+    this.submitting.set(true);
+    this.actionError.set(null);
+    try {
+      await this.api.deletePost(post.id);
+      this.posts.update(posts => posts.filter(item => item.id !== post.id));
+    } catch (e: unknown) {
+      this.actionError.set(this.lireErreur(e, 'La suppression a échoué. Réessayez.'));
     } finally {
       this.submitting.set(false);
     }
