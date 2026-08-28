@@ -44,7 +44,7 @@ cd "$APP_DIR"
 # NODE_ENV ne doit pas valoir "production" ici, sinon npm ci n'installerait
 # pas les devDependencies nécessaires au compilateur Angular.
 sudo -u harmy env HOME=/var/lib/harmy NODE_ENV=development npm ci --no-audit --no-fund --legacy-peer-deps
-sudo -u harmy env HOME=/var/lib/harmy NODE_ENV=development npm run build
+sudo -u harmy env HOME=/var/lib/harmy NODE_ENV=development NG_CLI_ANALYTICS=false CI=true npm run build
 
 echo
 echo "### 4/6 — Redémarrage des services"
