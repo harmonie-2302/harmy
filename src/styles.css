@@ -68,11 +68,43 @@
   --color-gray-900: #0D0D0D;   /* Noir Profond */
 }
 
+/*
+ * Universal box-sizing reset — prevents padding/border from expanding
+ * elements beyond their declared width on every browser.
+ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Prevent horizontal overflow at the root level.  `clip` is preferred over
+ * `hidden` because it does not create a new scroll container and therefore
+ * does not break `position: sticky` children.
+ */
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  /* Use dynamic viewport height on supporting browsers so that mobile
+     address-bar and navigation gestures are accounted for. */
+  min-height: 100vh;
+}
+@supports (min-height: 100dvh) {
+  html {
+    min-height: 100dvh;
+  }
+}
+
 body {
   font-family: var(--font-sans);
   background-color: #FAF8F5;
   color: #1A1815;
-  overflow-x: hidden;
+  overflow-x: clip;
+  min-height: 100vh;
+}
+@supports (min-height: 100dvh) {
+  body {
+    min-height: 100dvh;
+  }
 }
 
 /* Keep fixed mobile navigation from hiding the last form/card controls. */
@@ -227,11 +259,6 @@ body {
   background: #C5A059;
 }
 
-/* Smooth scrolling globally */
-html {
-  scroll-behavior: smooth;
-}
-
 /* Scroll-triggered fade-in animations */
 .scroll-fade-init {
   opacity: 0;
@@ -261,6 +288,31 @@ html {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/*
+ * Intrinsic card grids: the available container width, not a device-specific
+ * breakpoint, decides when cards share a row. min(100%, ...) prevents the
+ * minimum track from overflowing very narrow viewports.
+ */
+.role-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.audience-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  width: 100%;
+}
+
+.role-card-grid > *,
+.audience-card-grid > * {
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Screen size adaptations for text and containers */
@@ -295,3 +347,4 @@ html {
     overscroll-behavior: contain;
   }
 }
+

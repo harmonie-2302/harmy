@@ -1,13 +1,13 @@
-<div class="min-h-screen flex flex-col bg-pagne-subtle">
+<div class="flex flex-col bg-pagne-subtle overflow-x-clip" style="min-height: 100vh; min-height: 100dvh;">
 
   <!-- ================= EN-TÊTE PRINCIPAL ================= -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gold-500/20 custom-shadow">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4 min-w-0 overflow-x-clip">
 
       <!-- Marque -->
       <a routerLink="/" class="flex items-center gap-3 group shrink-0">
         <img src="/logo.png" alt="Harmy'Swing" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gold-500/50 shadow-md transform group-hover:scale-105 transition-transform" />
-        <div class="hidden xs:block">
+        <div class="hidden sm:block">
           <span class="serif-header text-lg sm:text-2xl font-bold text-gray-900 tracking-wide block leading-none">Harmy'Swing</span>
           <span class="text-[9px] uppercase tracking-widest text-gold-600 font-extrabold block mt-0.5" style="font-size: 8px;">Haute Couture &amp; Atelier</span>
         </div>
@@ -122,7 +122,7 @@
   </header>
 
   <!-- ================= NAVIGATION MOBILE ================= -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-mahogany-100 flex items-center justify-around h-[calc(4rem+env(safe-area-inset-bottom))] px-2 pb-[env(safe-area-inset-bottom)] custom-shadow-lg">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-mahogany-100 flex items-center justify-around px-2 custom-shadow-lg" style="height: calc(4rem + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px);">
     <a routerLink="/" routerLinkActive="text-mahogany-500 font-bold" [routerLinkActiveOptions]="{ exact: true }"
        class="flex flex-col items-center justify-center text-gray-400 hover:text-mahogany-500 transition-all">
       <span class="material-icons text-xl">home</span>
@@ -165,7 +165,7 @@
   </nav>
 
   <!-- ================= CONTENU ================= -->
-  <main class="flex-grow pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-8">
+  <main class="flex-grow md:pb-8" style="padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));">
     <router-outlet></router-outlet>
   </main>
 </div>

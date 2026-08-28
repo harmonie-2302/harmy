@@ -11,30 +11,30 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
   standalone: true,
   imports: [CommonModule, RouterModule, ScrollFadeDirective],
   template: `
-    <div class="animate-fade-in text-gray-900 bg-pagne-subtle min-h-screen overflow-x-hidden">
+    <div class="animate-fade-in text-gray-900 bg-pagne-subtle min-h-screen overflow-x-clip w-full">
       
       <!-- 1. HERO SECTION -->
-      <section class="relative min-h-[85vh] flex items-center bg-gradient-to-tr from-noir-profond via-bordeaux-950 to-emerald-950 text-white overflow-hidden py-16 sm:py-24 border-b border-gold-500/30">
+      <section class="relative flex items-center bg-gradient-to-tr from-noir-profond via-bordeaux-950 to-emerald-950 text-white overflow-hidden py-12 sm:py-24 border-b border-gold-500/30 w-full" style="min-height: 85vh; min-height: 85dvh;">
         
         <!-- Ambient Radial Glows -->
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-gold-500/20 via-transparent to-transparent pointer-events-none"></div>
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-emerald-600/15 via-transparent to-transparent pointer-events-none"></div>
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full min-w-0">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             <!-- Left Hero Content -->
-            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left min-w-0">
               
               <!-- Trust Badge -->
-              <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-gold-500/40 backdrop-blur-md text-gold-300 text-xs font-semibold uppercase tracking-widest custom-shadow">
-                <span class="material-icons text-sm text-gold-400">verified</span>
-                <span>Plus de carnets papier perdus • 100% Sécurisé & Responsive</span>
+              <div class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-white/10 border border-gold-500/40 backdrop-blur-md text-gold-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider sm:tracking-widest custom-shadow max-w-full text-center flex-wrap">
+                <span class="material-icons text-sm text-gold-400 shrink-0">verified</span>
+                <span>Plus de carnets papier perdus • 100% Sécurisé &amp; Responsive</span>
               </div>
 
               <!-- Main Title -->
-              <h1 class="serif-header text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white tracking-tight">
+              <h1 class="serif-header text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-white tracking-tight break-words">
                 La première plateforme numérique dédiée à l'art de la 
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600">
                   couture sur-mesure africaine
@@ -77,18 +77,18 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               </div>
 
               <!-- Quick Micro Stats under Hero -->
-              <div class="pt-6 border-t border-white/10 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 text-center lg:text-left">
+              <div class="pt-6 border-t border-white/10 grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto lg:mx-0 text-center lg:text-left">
                 <div>
-                  <span class="block text-2xl font-bold text-gold-400">100+</span>
-                  <span class="text-xs text-gray-400">Ateliers numérisés</span>
+                  <span class="block text-xl sm:text-2xl font-bold text-gold-400">100+</span>
+                  <span class="text-[10px] sm:text-xs text-gray-400">Ateliers numérisés</span>
                 </div>
                 <div>
-                  <span class="block text-2xl font-bold text-gold-400">1000+</span>
-                  <span class="text-xs text-gray-400">Carnets sécurisés</span>
+                  <span class="block text-xl sm:text-2xl font-bold text-gold-400">1000+</span>
+                  <span class="text-[10px] sm:text-xs text-gray-400">Carnets sécurisés</span>
                 </div>
                 <div>
-                  <span class="block text-2xl font-bold text-gold-400">99%</span>
-                  <span class="text-xs text-gray-400">Satisfaction</span>
+                  <span class="block text-xl sm:text-2xl font-bold text-gold-400">99%</span>
+                  <span class="text-[10px] sm:text-xs text-gray-400">Satisfaction</span>
                 </div>
               </div>
 
@@ -245,16 +245,16 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             </p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div class="audience-card-grid items-stretch">
             
             <!-- Left Box: Couturières & Artisans -->
-            <div appScrollFade class="bg-noir-profond text-white p-8 sm:p-10 rounded-3xl border-2 border-gold-500/40 custom-shadow-lg relative overflow-hidden flex flex-col justify-between">
+            <div appScrollFade class="min-w-0 h-full bg-noir-profond text-white p-6 sm:p-10 rounded-3xl border-2 border-gold-500/40 custom-shadow-lg relative overflow-hidden flex flex-col justify-between">
               
               <div class="absolute -right-16 -top-16 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
               <div>
-                <div class="flex items-center justify-between mb-6">
-                  <span class="px-3.5 py-1 rounded-full bg-gold-500/20 text-gold-300 text-xs font-extrabold uppercase tracking-widest border border-gold-500/30">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                  <span class="max-w-full px-3.5 py-1 rounded-full bg-gold-500/20 text-gold-300 text-xs font-extrabold uppercase tracking-widest border border-gold-500/30 break-words">
                     Espace SaaS Atelier
                   </span>
                   <span class="material-icons text-3xl text-gold-400">content_cut</span>
@@ -297,13 +297,13 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             </div>
 
             <!-- Right Box: Clientes & Passionnées -->
-            <div appScrollFade class="bg-gradient-to-tr from-emerald-950 via-noir-profond to-bordeaux-950 text-white p-8 sm:p-10 rounded-3xl border-2 border-emerald-500/40 custom-shadow-lg relative overflow-hidden flex flex-col justify-between">
+            <div appScrollFade class="min-w-0 h-full bg-gradient-to-tr from-emerald-950 via-noir-profond to-bordeaux-950 text-white p-6 sm:p-10 rounded-3xl border-2 border-emerald-500/40 custom-shadow-lg relative overflow-hidden flex flex-col justify-between">
               
               <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
               <div>
-                <div class="flex items-center justify-between mb-6">
-                  <span class="px-3.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold uppercase tracking-widest border border-emerald-500/30">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                  <span class="max-w-full px-3.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold uppercase tracking-widest border border-emerald-500/30 break-words">
                     Marketplace & Suivi
                   </span>
                   <span class="material-icons text-3xl text-emerald-400">accessibility</span>

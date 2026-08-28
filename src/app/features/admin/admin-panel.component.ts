@@ -66,12 +66,12 @@ import { CommonModule } from '@angular/common';
           <h2 class="serif-header text-xl font-bold text-gray-900 mb-4">Gestion des Abonnements Ateliers (SaaS)</h2>
           <div class="space-y-3">
             @for (a of ateliers(); track a.id) {
-              <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
+              <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h4 class="font-bold text-sm text-gray-900">{{ a.name }}</h4>
                   <p class="text-xs text-gray-500 font-light">{{ a.location.city }}, {{ a.location.country }}</p>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3">
                   <span [class]="getAtelierSubStatus(a) === 'active' ? 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700' : 'text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-700'">
                     {{ getAtelierSubStatus(a) === 'active' ? 'Abonnement Actif' : 'Abonnement Inactif' }}
                   </span>
@@ -92,7 +92,7 @@ import { CommonModule } from '@angular/common';
           <h2 class="serif-header text-xl font-bold text-gray-900 mb-4">Signalements de Contenu</h2>
           <div class="space-y-3">
             @for (r of reports(); track r.id) {
-              <div class="p-4 bg-red-50/50 rounded-2xl border border-red-100 flex items-center justify-between">
+              <div class="p-4 bg-red-50/50 rounded-2xl border border-red-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h4 class="font-bold text-xs text-gray-900">{{ r.postTitle }}</h4>
                   <p class="text-xs text-red-600 font-light">Raison: {{ r.reason }}</p>

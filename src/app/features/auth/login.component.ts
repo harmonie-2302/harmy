@@ -24,8 +24,8 @@ interface AuthResponse {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-noir-profond text-white p-4">
-      <div class="max-w-md w-full bg-white text-gray-900 rounded-3xl p-8 shadow-2xl border border-gold-500/30">
+    <div class="flex items-center justify-center bg-noir-profond text-white px-3 sm:px-4 py-6 sm:py-12 w-full overflow-x-clip" style="min-height: 100vh; min-height: 100dvh;">
+      <div class="max-w-md w-full bg-white text-gray-900 rounded-3xl p-4 sm:p-8 shadow-2xl border border-gold-500/30 box-border animate-fade-in">
         
         <!-- Branding Header -->
         <div class="text-center mb-8">

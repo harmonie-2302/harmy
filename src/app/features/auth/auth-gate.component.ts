@@ -25,16 +25,16 @@ interface AuthResponse {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   template: `
-    <div class="min-h-[85vh] flex items-center justify-center px-4 bg-white py-12">
-      <div class="w-full max-w-lg bg-white p-8 rounded-3xl custom-shadow-lg border border-gold-500/20 animate-fade-in">
+    <div class="flex items-center justify-center px-3 sm:px-4 bg-white py-6 sm:py-12 w-full overflow-x-clip" style="min-height: 85vh; min-height: 85dvh;">
+      <div class="w-full max-w-lg bg-white p-4 sm:p-8 rounded-3xl custom-shadow-lg border border-gold-500/20 animate-fade-in box-border">
         
         <!-- Luxury Branding -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-6 sm:mb-8">
           <span class="inline-block p-3.5 rounded-2xl bg-gold-50 text-gold-600 mb-3 border border-gold-500/20">
             <span class="material-icons text-3xl">brush</span>
           </span>
-          <h1 class="serif-header text-3xl font-bold text-gray-900 tracking-wide">Harmy'Swing</h1>
-          <p class="text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">Création de Compte Atelier & Cliente</p>
+          <h1 class="serif-header text-2xl sm:text-3xl font-bold text-gray-900 tracking-wide">Harmy'Swing</h1>
+          <p class="text-[10px] sm:text-xs text-gold-700 font-bold uppercase tracking-widest mt-1">Création de Compte Atelier &amp; Cliente</p>
         </div>
 
         @if (errorMessage()) {
@@ -47,7 +47,7 @@ interface AuthResponse {
         <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
           <div class="space-y-4">
             
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Prénom</label>
                 <input 
@@ -95,33 +95,33 @@ interface AuthResponse {
 
             <div>
               <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Sélectionner votre Rôle</label>
-              <div class="grid grid-cols-2 gap-3">
+              <div class="role-card-grid">
                 <label 
-                  class="flex items-center justify-between p-4 border rounded-2xl cursor-pointer hover:bg-gold-50/50 transition-all"
+                  class="w-full min-w-0 flex items-center justify-between gap-2.5 p-3 sm:p-4 border rounded-2xl cursor-pointer hover:bg-gold-50/50 transition-all select-none box-border"
                   [class.border-gold-500]="registerForm.get('role')?.value === 'COUTURIERE'"
                   [class.bg-gold-50/60]="registerForm.get('role')?.value === 'COUTURIERE'">
-                  <div class="flex items-center gap-2">
-                    <span class="material-icons text-gold-600">cut</span>
-                    <div class="text-left">
-                      <p class="text-xs font-bold text-gray-900">Couturière</p>
-                      <p class="text-[9px] text-gray-500">Atelier & Commandes</p>
+                  <div class="min-w-0 flex items-center gap-2.5 flex-1 overflow-hidden">
+                    <span class="material-icons text-gold-600 shrink-0 text-xl sm:text-2xl">cut</span>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-xs font-bold text-gray-900 truncate">Couturière</p>
+                      <p class="text-[10px] text-gray-500 leading-tight truncate">Atelier &amp; Commandes</p>
                     </div>
                   </div>
-                  <input type="radio" formControlName="role" value="COUTURIERE" class="accent-gold-500">
+                  <input type="radio" formControlName="role" value="COUTURIERE" class="accent-gold-500 shrink-0 cursor-pointer ml-1">
                 </label>
 
                 <label 
-                  class="flex items-center justify-between p-4 border rounded-2xl cursor-pointer hover:bg-gold-50/50 transition-all"
+                  class="w-full min-w-0 flex items-center justify-between gap-2.5 p-3 sm:p-4 border rounded-2xl cursor-pointer hover:bg-gold-50/50 transition-all select-none box-border"
                   [class.border-gold-500]="registerForm.get('role')?.value === 'CLIENTE'"
                   [class.bg-gold-50/60]="registerForm.get('role')?.value === 'CLIENTE'">
-                  <div class="flex items-center gap-2">
-                    <span class="material-icons text-bordeaux-800">accessibility</span>
-                    <div class="text-left">
-                      <p class="text-xs font-bold text-gray-900">Cliente</p>
-                      <p class="text-[9px] text-gray-500">Mesures & Suivi</p>
+                  <div class="min-w-0 flex items-center gap-2.5 flex-1 overflow-hidden">
+                    <span class="material-icons text-bordeaux-800 shrink-0 text-xl sm:text-2xl">accessibility</span>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-xs font-bold text-gray-900 truncate">Cliente</p>
+                      <p class="text-[10px] text-gray-500 leading-tight truncate">Mesures &amp; Suivi</p>
                     </div>
                   </div>
-                  <input type="radio" formControlName="role" value="CLIENTE" class="accent-gold-500">
+                  <input type="radio" formControlName="role" value="CLIENTE" class="accent-gold-500 shrink-0 cursor-pointer ml-1">
                 </label>
               </div>
             </div>
