@@ -157,7 +157,7 @@ import { CommonModule } from '@angular/common';
                         <button
                           (click)="contactAtelier(a)"
                           class="text-[10px] font-bold text-gold-700 hover:text-gold-800 flex items-center gap-1">
-                          <span class="material-icons text-xs text-gold-600">chat</span> Contacter
+                          <span class="material-icons text-xs text-gold-600">chat</span> Envoyer un message au couturier
                         </button>
                         <button 
                           (click)="openReviewForAtelier(a)"
@@ -228,6 +228,14 @@ import { CommonModule } from '@angular/common';
                     <span [class]="(o.pricing?.balance ?? o.soldeRestant ?? 0) > 0 ? 'text-red-500 font-bold' : 'text-emerald-600 font-bold'">
                       Solde Restant: {{ o.pricing?.balance ?? o.soldeRestant ?? 0 | number }} FC
                     </span>
+                  </div>
+
+                  <div class="flex justify-end pt-2">
+                    <button 
+                      (click)="contactAtelierByOrder(o)"
+                      class="btn-gold px-3 py-1.5 text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                      <span class="material-icons text-[12px]">chat</span> Envoyer un message au couturier
+                    </button>
                   </div>
                 </div>
               }
@@ -473,6 +481,20 @@ export class ClientSpaceComponent implements OnInit {
     try {
       const ownerId = atelier.ownerId || atelier.couturiereId || '';
       await this.api.startConversation(ownerId, atelier.id);
+      this.router.navigate(['/messagerie']);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async contactAtelierByOrder(order: Order) {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+    if (!order.atelierId) return;
+    try {
+      await this.api.startConversation('', order.atelierId);
       this.router.navigate(['/messagerie']);
     } catch (e) {
       console.error(e);
