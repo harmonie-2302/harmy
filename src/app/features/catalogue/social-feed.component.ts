@@ -255,21 +255,41 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
 
           <form [formGroup]="postForm" (ngSubmit)="submitPost()" class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Légende & Description du Modèle</label>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                Légende & Description du Modèle <span class="text-red-500">*</span>
+              </label>
               <textarea 
                 formControlName="caption" 
                 rows="3" 
                 placeholder="Décrivez le modèle, les tissus utilisés (Bazin, Wax, Kente)..."
-                class="w-full px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500"></textarea>
+                class="w-full px-4 py-2.5 text-xs bg-gray-50 border rounded-xl focus:outline-none focus:border-gold-500 transition-colors"
+                [class.border-red-400]="postForm.get('caption')?.touched && postForm.get('caption')?.invalid"
+                [class.border-gray-200]="!postForm.get('caption')?.touched || !postForm.get('caption')?.invalid"></textarea>
+              @if (postForm.get('caption')?.touched && postForm.get('caption')?.invalid) {
+                <p class="text-[11px] font-semibold text-red-600 flex items-center gap-1 mt-1">
+                  <span class="material-icons text-xs">error_outline</span>
+                  <span>La description du modèle est obligatoire.</span>
+                </p>
+              }
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Prix Estimé (FC)</label>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                  Prix Estimé (FC) <span class="text-red-500">*</span>
+                </label>
                 <input 
                   type="number" 
                   formControlName="priceHint"
-                  class="w-full px-4 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gold-500">
+                  class="w-full px-4 py-2.5 text-xs bg-gray-50 border rounded-xl focus:outline-none focus:border-gold-500 transition-colors"
+                  [class.border-red-400]="postForm.get('priceHint')?.touched && postForm.get('priceHint')?.invalid"
+                  [class.border-gray-200]="!postForm.get('priceHint')?.touched || !postForm.get('priceHint')?.invalid">
+                @if (postForm.get('priceHint')?.touched && postForm.get('priceHint')?.invalid) {
+                  <p class="text-[11px] font-semibold text-red-600 flex items-center gap-1 mt-1">
+                    <span class="material-icons text-xs">error_outline</span>
+                    <span>Indiquez un prix supérieur ou égal à 0.</span>
+                  </p>
+                }
               </div>
 
               <div>
@@ -283,7 +303,9 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Image du Modèle</label>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                Image du Modèle <span class="text-red-500">*</span>
+              </label>
               <div class="space-y-2">
                 <input 
                   type="file" 
@@ -341,6 +363,13 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               </div>
             </div>
 
+            @if (publishError(); as erreur) {
+              <div class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-start gap-2">
+                <span class="material-icons text-sm mt-0.5 shrink-0">error_outline</span>
+                <span>{{ erreur }}</span>
+              </div>
+            }
+
             <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
               <button 
                 type="button" 
@@ -350,18 +379,11 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
               </button>
               <button 
                 type="submit" 
-                [disabled]="postForm.invalid || uploading() || submitting()"
+                [disabled]="uploading() || submitting()"
                 class="btn-gold px-5 py-2 text-xs font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ uploading() ? 'Envoi de l\\'image…' : submitting() ? 'Enregistrement…' : editingPost() ? 'Enregistrer les modifications' : 'Publier la Création' }}
               </button>
             </div>
-
-            @if (publishError(); as erreur) {
-              <p class="text-[11px] font-semibold text-red-600 flex items-start gap-1.5 justify-end">
-                <span class="material-icons text-sm mt-px">warning</span>
-                <span>{{ erreur }}</span>
-              </p>
-            }
           </form>
 
         </div>
@@ -638,12 +660,28 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
   }
 
   async submitPost() {
-    if (this.postForm.invalid || this.uploading() || this.submitting()) return;
+    if (this.uploading() || this.submitting()) return;
+
+    this.postForm.markAllAsTouched();
+    this.publishError.set(null);
 
     const { caption, priceHint, mediaUrl, tagsInput } = this.postForm.value;
+    const desc = (caption || '').trim();
+    if (!desc) {
+      this.publishError.set("Veuillez renseigner la description de votre modèle.");
+      return;
+    }
+
     const image = (mediaUrl || '').trim();
     if (!image) {
       this.uploadError.set("Ajoutez une image avant de publier votre création.");
+      this.publishError.set("Veuillez sélectionner ou fournir une image pour votre création.");
+      return;
+    }
+
+    const price = Number(priceHint);
+    if (priceHint === null || priceHint === undefined || isNaN(price) || price < 0) {
+      this.publishError.set("Veuillez renseigner un prix estimé valide (supérieur ou égal à 0).");
       return;
     }
 
@@ -653,17 +691,16 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
       .filter(t => t.length > 0);
 
     this.submitting.set(true);
-    this.publishError.set(null);
     try {
       if (this.editingPost()) {
         await this.api.updatePost(this.editingPost()!.id, {
-          caption: caption || '',
-          priceHint: priceHint || 0,
+          caption: desc,
+          priceHint: price,
           tags,
           media: [image]
         });
       } else {
-        await this.api.createPost(caption || '', priceHint || 0, tags, [image]);
+        await this.api.createPost(desc, price, tags, [image]);
       }
       this.openPostModal.set(false);
       this.reinitialiserFormulaire();
