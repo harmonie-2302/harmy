@@ -192,10 +192,30 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.authService.isAuthenticated()) {
-      this.loadInbox().then(() => {
+      this.loadInbox().then(async () => {
         const convId = this.route.snapshot.queryParamMap.get('convId');
         if (convId) {
-          const conv = this.conversations().find(c => c.id === convId);
+          let conv = this.conversations().find(c => c.id === convId);
+          if (!conv) {
+            // If the conversation has 0 messages, it won't be returned by loadInbox().
+            // We can extract the partner ID from 'room_<uuid1>_<uuid2>' and fetch it directly.
+            const parts = convId.split('_');
+            if (parts.length === 3) {
+              const myId = this.authService.currentUser()?.id;
+              const otherId = parts[1] === myId ? parts[2] : parts[1];
+              if (otherId) {
+                try {
+                  const newConv = await this.api.startConversation(otherId);
+                  if (newConv) {
+                    conv = newConv;
+                    this.conversations.update(list => [newConv, ...list]);
+                  }
+                } catch (e) {
+                  console.error("Failed to load empty conversation", e);
+                }
+              }
+            }
+          }
           if (conv) {
             this.selectConversation(conv);
           }
@@ -221,8 +241,12 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
 
   async loadInbox() {
     try {
-      const list = await this.api.getConversations();
-      this.conversations.set(list || []);
+      const list = await this.api.getConversations() || [];
+      const active = this.selectedConv();
+      if (active && !list.some(c => c.id === active.id)) {
+        list.unshift(active);
+      }
+      this.conversations.set(list);
     } catch (e) {
       console.error(e);
     }
