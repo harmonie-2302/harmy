@@ -205,18 +205,38 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
                       <input 
                         type="text" 
                         #commentInput
-                        placeholder="Écrire un commentaire..." 
+                        placeholder="Écrire un commentaire public..." 
                         class="flex-1 min-w-0 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-gold-500"
                         (keyup.enter)="submitComment(p, commentInput.value); commentInput.value = ''">
                       <button 
                         (click)="submitComment(p, commentInput.value); commentInput.value = ''"
                         class="btn-gold px-3 py-1.5 text-xs font-bold shadow">
-                        Envoyer
+                        Commenter
                       </button>
+                    </div>
+
+                    <!-- Add Direct Message Form -->
+                    <div class="flex flex-col gap-2 pt-4 mt-3 border-t border-gray-100">
+                      <h4 class="text-[11px] font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-icons text-xs text-gold-600">chat</span> Contacter en privé
+                      </h4>
+                      <div class="flex gap-2">
+                        <input 
+                          type="text" 
+                          #messageInput
+                          placeholder="Envoyer un message au couturier..." 
+                          class="flex-1 min-w-0 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-gold-500"
+                          (keyup.enter)="sendDirectMessage(p, messageInput.value); messageInput.value = ''">
+                        <button 
+                          (click)="sendDirectMessage(p, messageInput.value); messageInput.value = ''"
+                          class="bg-noir-profond text-gold-400 px-3 py-1.5 text-xs font-bold shadow rounded-xl">
+                          Envoyer
+                        </button>
+                      </div>
                     </div>
                   } @else {
                     <p class="text-[10px] text-gold-700 italic pt-1">
-                      <a routerLink="/auth/login" class="underline font-bold">Connectez-vous</a> pour réagir et publier un commentaire.
+                      <a routerLink="/auth/login" class="underline font-bold">Connectez-vous</a> pour réagir et contacter le couturier.
                     </p>
                   }
                 </div>
@@ -549,6 +569,26 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
       this.router.navigate(['/messagerie'], { queryParams: { convId: conv.id } });
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async sendDirectMessage(post: Post, text: string) {
+    if (!text || text.trim().length === 0) return;
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+    try {
+      // Create or get the conversation
+      const conv = await this.api.startConversation(post.authorId, post.atelierId);
+      // Send the message
+      await this.api.sendMessage(conv.id, text.trim());
+      // Show confirmation or navigate
+      alert("Votre message a bien été envoyé au couturier !");
+      this.router.navigate(['/messagerie'], { queryParams: { convId: conv.id } });
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de l'envoi du message.");
     }
   }
 
