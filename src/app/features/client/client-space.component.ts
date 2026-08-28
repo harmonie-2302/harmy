@@ -480,8 +480,8 @@ export class ClientSpaceComponent implements OnInit {
     }
     try {
       const ownerId = atelier.ownerId || atelier.couturiereId || '';
-      await this.api.startConversation(ownerId, atelier.id);
-      this.router.navigate(['/messagerie']);
+      const conv = await this.api.startConversation(ownerId, atelier.id);
+      this.router.navigate(['/messagerie'], { queryParams: { convId: conv.id } });
     } catch (e) {
       console.error(e);
     }
@@ -494,8 +494,8 @@ export class ClientSpaceComponent implements OnInit {
     }
     if (!order.atelierId) return;
     try {
-      await this.api.startConversation('', order.atelierId);
-      this.router.navigate(['/messagerie']);
+      const conv = await this.api.startConversation('', order.atelierId);
+      this.router.navigate(['/messagerie'], { queryParams: { convId: conv.id } });
     } catch (e) {
       console.error(e);
     }

@@ -544,10 +544,9 @@ export class SocialFeedComponent implements OnInit, OnDestroy {
       this.router.navigate(['/auth/login']);
       return;
     }
-
     try {
-      await this.api.startConversation(post.authorId, post.atelierId);
-      this.router.navigate(['/messagerie']);
+      const conv = await this.api.startConversation(post.authorId, post.atelierId);
+      this.router.navigate(['/messagerie'], { queryParams: { convId: conv.id } });
     } catch (e) {
       console.error(e);
     }

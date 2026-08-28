@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit, OnDestroy, effect } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HarmyApiService as HarmyApi, Conversation, Message } from '@core/services/harmy-api.service';
 import { AuthService } from '@core/services/auth.service';
@@ -64,7 +64,12 @@ import { CommonModule } from '@angular/common';
                   </button>
                 }
                 @if (conversations().length === 0) {
-                  <p class="text-xs text-gray-400 italic text-center py-8">Aucune conversation enregistrée.</p>
+                  <div class="py-8 text-center px-4">
+                    <p class="text-xs text-gray-400 italic mb-4">Aucune conversation enregistrée.</p>
+                    <button (click)="router.navigate(['/catalogue'])" class="btn-gold px-4 py-2 text-[10px] font-bold shadow-md">
+                      Trouver un couturier
+                    </button>
+                  </div>
                 }
               </div>
             </div>
@@ -163,6 +168,7 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
   api = inject(HarmyApi);
   authService = inject(AuthService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
   fb = inject(FormBuilder);
 
   conversations = signal<Conversation[]>([]);
@@ -186,7 +192,15 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.authService.isAuthenticated()) {
-      this.loadInbox();
+      this.loadInbox().then(() => {
+        const convId = this.route.snapshot.queryParamMap.get('convId');
+        if (convId) {
+          const conv = this.conversations().find(c => c.id === convId);
+          if (conv) {
+            this.selectConversation(conv);
+          }
+        }
+      });
       if (typeof window !== 'undefined') {
         this.pollInterval = setInterval(() => {
           this.loadInbox();
