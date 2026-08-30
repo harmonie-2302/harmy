@@ -100,7 +100,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
                 
                 <!-- Background Image -->
                 <img 
-                  src="/hero_couture_dress.jpg" 
+                  src="/african_couture_hero.jpg" 
                   (error)="onImgError($event)"
                   alt="Harmy'Swing Haute Couture" 
                   class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">

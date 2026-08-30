@@ -25,7 +25,7 @@ import { ScrollFadeDirective } from '@shared/directives/scroll-fade.directive';
           <div class="md:col-span-5 xl:col-span-4 relative group min-w-0">
             <div class="relative rounded-2xl overflow-hidden border-2 border-gold-500/40 aspect-[3/4] shadow-2xl bg-noir-profond">
               <img 
-                src="/hero_couture_dress.jpg" 
+                src="/african_couture_hero.jpg" 
                 (error)="onImgError($event)"
                 class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" 
                 alt="Robe Sirène Haute Couture"
